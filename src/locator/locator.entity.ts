@@ -14,11 +14,11 @@ export class Locator {
   @Column({ type: 'date', nullable: true })
   birthDate: Date;
 
-  @Column({ type: 'bigint', nullable: true })
-  rg: number;
+  @Column({ length: 100, nullable: true })
+  rg: string;
 
-  @Column({ type: 'bigint', nullable: true })
-  cpf: number;
+  @Column({ length: 100, nullable: true })
+  cpf: string;
 
   @Column({ length: 100, nullable: true })
   nationality: string;
@@ -32,14 +32,14 @@ export class Locator {
   @Column({ length: 100, nullable: true })
   email: string;
 
-  @Column({ type: 'bigint', nullable: true })
-  contact1: number;
+  @Column({ length: 100, nullable: true })
+  contact1: string;
 
-  @Column({ type: 'bigint', nullable: true })
-  contact2: number;
+  @Column({ length: 100, nullable: true })
+  contact2: string;
 
-  @Column({ type: 'bigint', nullable: true })
-  cep: number;
+  @Column({ length: 100, nullable: true })
+  cep: string;
 
   @Column({ length: 100, nullable: true })
   address: string;
@@ -56,11 +56,11 @@ export class Locator {
   @Column({ length: 100, nullable: true })
   accountType: string;
 
-  @Column({ type: 'int', nullable: true })
-  agency: number;
+  @Column({ length: 100, nullable: true })
+  agency: string;
 
-  @Column({ type: 'int', nullable: true })
-  accountNumber: number;
+  @Column({ length: 100, nullable: true })
+  accountNumber: string;
 
   @Column({ length: 100, nullable: true })
   paymentRemittance: string;

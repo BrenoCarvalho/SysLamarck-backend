@@ -2,21 +2,21 @@ export interface LocatorCreateDto {
   provisionService: string;
   fullName: string;
   birthDate: Date;
-  rg: number;
-  cpf: number;
+  rg: string;
+  cpf: string;
   nationality: string;
   maritalStatus: string;
   profession: string;
   email?: string;
-  contact1: number;
-  contact2?: number;
-  cep: number;
+  contact1: string;
+  contact2?: string;
+  cep: string;
   address: string;
   city: string;
   district: string;
   bank: string;
   accountType: string;
-  agency: number;
-  accountNumber: number;
+  agency: string;
+  accountNumber: string;
   paymentRemittance: string;
 }
