@@ -99,7 +99,7 @@ export class LocatorService {
     locator.cep = data.cep;
     locator.city = data.city;
     locator.district = data.district;
-    locator.propertyNumber = data.propertyNumber;
+    locator.address = data.address;
     locator.bank = data.bank;
     locator.accountType = data.accountType;
     locator.agency = data.agency;

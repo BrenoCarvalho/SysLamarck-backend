@@ -11,9 +11,9 @@ export interface LocatorCreateDto {
   contact1: number;
   contact2?: number;
   cep: number;
+  address: string;
   city: string;
   district: string;
-  propertyNumber: number;
   bank: string;
   accountType: string;
   agency: number;
