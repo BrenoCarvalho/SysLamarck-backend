@@ -8,5 +8,6 @@ import { LocatorController } from './locator.controller';
   imports: [DatabaseModule],
   controllers: [LocatorController],
   providers: [...locatorProviders, LocatorService],
+  exports: [LocatorService],
 })
 export class LocatorModule {}
