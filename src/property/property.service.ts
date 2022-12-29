@@ -58,7 +58,7 @@ export class PropertyService {
       });
   }
 
-  async generatePropertyCode(): Promise<number> {
+  async generatePropertyId(): Promise<number> {
     const response = await this.propertyRepository.find({
       select: { id: true },
     });
@@ -86,6 +86,18 @@ export class PropertyService {
     return code;
   }
 
+  async generateProperty(locatorCode: number): Promise<number> {
+    const response = await this.propertyRepository.findBy({ locatorCode });
+
+    const properties = [];
+
+    response.map((value) => {
+      properties.push(value.property);
+    });
+
+    return properties.length ? Math.max(...properties) + 1 : 1;
+  }
+
   async getLocatorName(locatorCode: number): Promise<string> {
     const locator: Locator = await this.locatorService.findOne(locatorCode);
     return locator?.fullName;
@@ -94,8 +106,13 @@ export class PropertyService {
   async create(data: PropertyCreateDto): Promise<string> {
     const property = new Property();
 
-    property.id = await this.generatePropertyCode();
+    property.id = await this.generatePropertyId();
     property.locatorCode = data.locatorCode;
+    property.property = await this.generateProperty(data.locatorCode);
+    property.propertyCode = `${String(data.locatorCode).padStart(
+      3,
+      '0',
+    )}${String(property.property).padStart(3, '0')}`;
     property.locatorName = await this.getLocatorName(data.locatorCode);
     property.propertyType = data.propertyType;
     property.cep = data.cep;

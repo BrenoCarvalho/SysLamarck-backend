@@ -5,8 +5,14 @@ export class Property {
   @PrimaryColumn('int')
   id: number;
 
+  @Column({ length: 100 })
+  propertyCode: string;
+
   @Column('int')
   locatorCode: number;
+
+  @Column('int')
+  property: number;
 
   @Column({ length: 100, nullable: true })
   locatorName: string;
