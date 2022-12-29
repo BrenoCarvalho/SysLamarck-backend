@@ -112,7 +112,7 @@ export class PropertyService {
     property.propertyCode = `${String(data.locatorCode).padStart(
       3,
       '0',
-    )}${String(property.property).padStart(3, '0')}`;
+    )}/${String(property.property).padStart(3, '0')}`;
     property.locatorName = await this.getLocatorName(data.locatorCode);
     property.propertyType = data.propertyType;
     property.cep = data.cep;
