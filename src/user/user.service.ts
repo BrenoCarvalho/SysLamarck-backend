@@ -30,21 +30,6 @@ export class UserService {
     user.username = data.username;
     user.email = data.email;
     user.password = bcrypt.hashSync(data.password, 8);
-    user.birthDate = data.birthDate;
-    user.rg = data.rg;
-    user.cpf = data.cpf;
-    user.nationality = data.nationality;
-    user.maritalStatus = data.maritalStatus;
-    user.contact1 = data.contact1;
-    user.contact2 = data.contact2;
-    user.cep = data.cep;
-    user.city = data.city;
-    user.district = data.district;
-    user.address = data.address;
-    user.bank = data.bank;
-    user.accountType = data.accountType;
-    user.agency = data.agency;
-    user.accountNumber = data.accountNumber;
 
     return this.userRepository
       .save(user)
