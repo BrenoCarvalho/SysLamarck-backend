@@ -4,26 +4,42 @@ import {
   HttpException,
   HttpStatus,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Property } from './property.entity';
 import { PropertyCreateDto } from './dto/property.create.dto';
 import { Locator } from 'src/locator/locator.entity';
 import { LocatorService } from 'src/locator/locator.service';
+import { TenantService } from 'src/tenant/tenant.service';
 
 @Injectable()
 export class PropertyService {
   constructor(
     @Inject('PROPERTY_REPOSITORY')
     private propertyRepository: Repository<Property>,
+
+    @Inject(forwardRef(() => LocatorService))
     private locatorService: LocatorService,
+
+    private tenantService: TenantService,
   ) {}
 
   async findAll(): Promise<Property[]> {
     return this.propertyRepository.find();
   }
 
+  async findBy(by: object): Promise<Property[]> {
+    return await this.propertyRepository.findBy(by);
+  }
+
   async delete(id: number): Promise<number> {
+    const tenants = await this.tenantService.findBy({ propertyId: id });
+
+    tenants.map(async (value) => {
+      await this.tenantService.delete(value?.tenantCode);
+    });
+
     return (await this.propertyRepository.delete(id)).affected;
   }
 

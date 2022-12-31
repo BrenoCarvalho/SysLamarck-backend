@@ -4,24 +4,37 @@ import {
   HttpException,
   HttpStatus,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Locator } from './locator.entity';
 import { LocatorCreateDto } from './dto/locator.create.dto';
+import { PropertyService } from 'src/property/property.service';
 
 @Injectable()
 export class LocatorService {
   constructor(
     @Inject('LOCATOR_REPOSITORY')
     private locatorRepository: Repository<Locator>,
+
+    @Inject(forwardRef(() => PropertyService))
+    private propertyService: PropertyService,
   ) {}
 
   async findAll(): Promise<Locator[]> {
     return this.locatorRepository.find();
   }
 
-  async delete(id: number): Promise<number> {
-    return (await this.locatorRepository.delete(id)).affected;
+  async delete(locatorCode: number): Promise<number> {
+    const properties = await this.propertyService.findBy({
+      locatorCode: locatorCode,
+    });
+
+    properties.map(async (value) => {
+      await this.propertyService.delete(value.id);
+    });
+
+    return (await this.locatorRepository.delete(locatorCode)).affected;
   }
 
   async findOne(id: number): Promise<Locator> {
@@ -106,7 +119,7 @@ export class LocatorService {
     locator.accountNumber = data.accountNumber;
     locator.paymentRemittance = data.paymentRemittance;
 
-    return this.locatorRepository
+    return await this.locatorRepository
       .save(locator)
       .then(() => {
         const msg = `Locator ${locator.locatorCode} created as succesfily`;
