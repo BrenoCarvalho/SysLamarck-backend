@@ -24,9 +24,17 @@ export class PropertyController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(':id')
+  @Get('findById/:id')
   async findOne(@Param() params): Promise<Property> {
     return this.propertyService.findOne(params.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('findByPropertyCode/:propertyCode')
+  async findByPropertyCode(@Param() params): Promise<Property> {
+    return this.propertyService.findOneBy({
+      propertyCode: params.propertyCode,
+    });
   }
 
   @UseGuards(JwtAuthGuard)

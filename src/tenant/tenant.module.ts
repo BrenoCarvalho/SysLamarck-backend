@@ -8,7 +8,7 @@ import { BailModule } from 'src/bail/bail.module';
 import { ResidentModule } from 'src/resident/resident.module';
 
 @Module({
-  imports: [DatabaseModule, ContractModule, BailModule, ResidentModule],
+  imports: [DatabaseModule, ResidentModule, ContractModule, BailModule],
   controllers: [TenantController],
   providers: [...tenantProviders, TenantService],
   exports: [TenantService],

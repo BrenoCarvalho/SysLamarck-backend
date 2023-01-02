@@ -33,6 +33,12 @@ export class PropertyService {
     return await this.propertyRepository.findBy(by);
   }
 
+  async findOneBy(by: object): Promise<Property> {
+    return JSON.stringify(by) != '{}'
+      ? await this.propertyRepository.findOneBy(by)
+      : null;
+  }
+
   async delete(id: number): Promise<number> {
     const tenants = await this.tenantService.findBy({ propertyId: id });
 
@@ -128,7 +134,7 @@ export class PropertyService {
     property.propertyCode = `${String(data.locatorCode).padStart(
       3,
       '0',
-    )}/${String(property.property).padStart(3, '0')}`;
+    )}${String(property.property).padStart(3, '0')}`;
     property.locatorName = await this.getLocatorName(data.locatorCode);
     property.propertyType = data.propertyType;
     property.cep = data.cep;
