@@ -1,4 +1,5 @@
 export interface PropertyCreateDto {
+  propertyCode?: string;
   locatorCode: number;
   locatorName?: string;
   propertyType: string;

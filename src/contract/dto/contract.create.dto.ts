@@ -1,5 +1,5 @@
 export interface ContractCreateDto {
-  contractCode: number;
+  contractCode?: number;
   applyDiscount: boolean;
   withholdingTax: boolean;
   goal: string;

@@ -15,82 +15,82 @@ export class Bail {
   militaryInsurance: string;
 
   @Column({ length: 100, nullable: true })
-  fullName: string;
+  fullNameG1: string;
 
   @Column({ type: 'date', nullable: true })
-  birthDate: Date;
+  birthDateG1: Date;
 
   @Column({ length: 100, nullable: true })
-  rg: string;
+  rgG1: string;
 
   @Column({ length: 100, nullable: true })
-  cpf: string;
+  cpfG1: string;
 
   @Column({ length: 100, nullable: true })
-  nationality: string;
+  nationalityG1: string;
 
   @Column({ length: 100, nullable: true })
-  maritalStatus: string;
+  maritalStatusG1: string;
 
   @Column({ length: 100, nullable: true })
-  profession: string;
+  professionG1: string;
 
   @Column({ length: 100, nullable: true })
-  email: string;
+  emailG1: string;
 
   @Column({ length: 100, nullable: true })
-  contact1: string;
+  contact1G1: string;
 
   @Column({ length: 100, nullable: true })
-  contact2: string;
+  contact2G1: string;
 
   @Column({ length: 100, nullable: true })
-  cep: string;
+  cepG1: string;
 
   @Column({ length: 100, nullable: true })
-  city: string;
+  cityG1: string;
 
   @Column({ length: 100, nullable: true })
-  district: string;
+  districtG1: string;
 
   @Column({ length: 100, nullable: true })
-  address: string;
+  addressG1: string;
 
   @Column({ length: 100, nullable: true })
-  SpouseFullName: string;
+  spouseFullNameG1: string;
 
   @Column({ type: 'date', nullable: true })
-  SpouseBirthDate: Date;
+  spouseBirthDateG1: Date;
 
   @Column({ length: 100, nullable: true })
-  SpouseRg: string;
+  spouseRgG1: string;
 
   @Column({ length: 100, nullable: true })
-  SpouseCpf: string;
+  spouseCpfG1: string;
 
   @Column({ length: 100, nullable: true })
-  SpouseNationality: string;
+  spouseNationalityG1: string;
 
   @Column({ length: 100, nullable: true })
-  SpouseProfession: string;
+  spouseProfessionG1: string;
 
   @Column({ length: 100, nullable: true })
-  SpouseContact1: string;
+  spouseContact1G1: string;
 
   @Column({ length: 100, nullable: true })
-  BailPropertyCep: string;
+  bailPropertyCepG1: string;
 
   @Column({ length: 100, nullable: true })
-  BailPropertyCity: string;
+  bailPropertyCityG1: string;
 
   @Column({ length: 100, nullable: true })
-  BailPropertyDistrict: string;
+  bailPropertyDistrictG1: string;
 
   @Column({ length: 100, nullable: true })
-  BailPropertyAddress: string;
+  bailPropertyAddressG1: string;
 
   @Column({ length: 100, nullable: true })
-  BailPropertyRegistrationNumber: string;
+  bailPropertyRegistrationNumberG1: string;
 
   @Column({ length: 100, nullable: true })
   fullNameG2: string;
@@ -135,40 +135,40 @@ export class Bail {
   addressG2: string;
 
   @Column({ length: 100, nullable: true })
-  SpouseFullNameG2: string;
+  spouseFullNameG2: string;
 
   @Column({ type: 'date', nullable: true })
-  SpouseBirthDateG2: Date;
+  spouseBirthDateG2: Date;
 
   @Column({ length: 100, nullable: true })
-  SpouseRgG2: string;
+  spouseRgG2: string;
 
   @Column({ length: 100, nullable: true })
-  SpouseCpfG2: string;
+  spouseCpfG2: string;
 
   @Column({ length: 100, nullable: true })
-  SpouseNationalityG2: string;
+  spouseNationalityG2: string;
 
   @Column({ length: 100, nullable: true })
-  SpouseProfessionG2: string;
+  spouseProfessionG2: string;
 
   @Column({ length: 100, nullable: true })
-  SpouseContact1G2: string;
+  spouseContact1G2: string;
 
   @Column({ length: 100, nullable: true })
-  BailPropertyCepG2: string;
+  bailPropertyCepG2: string;
 
   @Column({ length: 100, nullable: true })
-  BailPropertyCityG2: string;
+  bailPropertyCityG2: string;
 
   @Column({ length: 100, nullable: true })
-  BailPropertyDistrictG2: string;
+  bailPropertyDistrictG2: string;
 
   @Column({ length: 100, nullable: true })
-  BailPropertyAddressG2: string;
+  bailPropertyAddressG2: string;
 
   @Column({ length: 100, nullable: true })
-  BailPropertyRegistrationNumberG2: string;
+  bailPropertyRegistrationNumberG2: string;
 
   @CreateDateColumn()
   createdAt: Date;

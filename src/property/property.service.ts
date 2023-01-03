@@ -68,6 +68,10 @@ export class PropertyService {
 
     data.locatorName = await this.getLocatorName(data.locatorCode);
 
+    data.propertyCode = `${String(data.locatorCode).padStart(3, '0')}${String(
+      property.property,
+    ).padStart(3, '0')}`;
+
     return this.propertyRepository
       .update({ id: id }, data)
       .then(() => {

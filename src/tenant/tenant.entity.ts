@@ -77,14 +77,10 @@ export class Tenant {
   residents: number[];
 
   @Column({ type: 'int', nullable: true })
-  contractCode: number;
-
-  contract: Contract;
+  contract: number | Contract;
 
   @Column({ type: 'int', nullable: true })
-  bailCode: number;
-
-  bail: Bail;
+  bail: number | Bail;
 
   @CreateDateColumn()
   createdAt: Date;
