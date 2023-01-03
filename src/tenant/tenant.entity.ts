@@ -1,3 +1,5 @@
+import { Bail } from 'src/bail/bail.entity';
+import { Contract } from 'src/contract/contract.entity';
 import { Entity, Column, CreateDateColumn, PrimaryColumn } from 'typeorm';
 
 @Entity()
@@ -5,7 +7,7 @@ export class Tenant {
   @PrimaryColumn('int')
   tenantCode: number;
 
-  @Column('int')
+  @Column({ type: 'int', nullable: true })
   propertyId: number;
 
   @Column({ length: 10 })
@@ -42,43 +44,47 @@ export class Tenant {
   contact2: string;
 
   @Column({ length: 100, nullable: true })
-  T2fullName: string;
+  fullNameT2: string;
 
   @Column({ type: 'date', nullable: true })
-  T2birthDate: Date;
+  birthDateT2: Date;
 
   @Column({ length: 100, nullable: true })
-  T2rg: string;
+  rgT2: string;
 
   @Column({ length: 100, nullable: true })
-  T2cpf: string;
+  cpfT2: string;
 
   @Column({ length: 100, nullable: true })
-  T2nationality: string;
+  nationalityT2: string;
 
   @Column({ length: 100, nullable: true })
-  T2maritalStatus: string;
+  maritalStatusT2: string;
 
   @Column({ length: 100, nullable: true })
-  T2profession: string;
+  professionT2: string;
 
   @Column({ length: 100, nullable: true })
-  T2email: string;
+  emailT2: string;
 
   @Column({ length: 100, nullable: true })
-  T2contact1: string;
+  contact1T2: string;
 
   @Column({ length: 100, nullable: true })
-  T2contact2: string;
+  contact2T2: string;
 
   @Column('simple-array')
   residents: number[];
 
-  @Column('int')
+  @Column({ type: 'int', nullable: true })
   contractCode: number;
 
-  @Column('int')
+  contract: Contract;
+
+  @Column({ type: 'int', nullable: true })
   bailCode: number;
+
+  bail: Bail;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -3,7 +3,7 @@ import { ContractCreateDto } from 'src/contract/dto/contract.create.dto';
 import { ResidentCreateDto } from 'src/resident/dto/resident.create.dto';
 
 export interface TenantCreateDto {
-  propertyId: number;
+  propertyId?: number;
   propertyCode: string;
   fullName: string;
   birthDate: Date;
@@ -15,16 +15,16 @@ export interface TenantCreateDto {
   email: string;
   contact1: string;
   contact2: string;
-  T2fullName?: string;
-  T2birthDate?: Date;
-  T2rg?: string;
-  T2cpf?: string;
-  T2nationality?: string;
-  T2maritalStatus?: string;
-  T2profession?: string;
-  T2email?: string;
-  T2contact1?: string;
-  T2contact2?: string;
+  fullNameT2?: string;
+  birthDateT2?: Date;
+  rgT2?: string;
+  cpfT2?: string;
+  nationalityT2?: string;
+  maritalStatusT2?: string;
+  professionT2?: string;
+  emailT2?: string;
+  contact1T2?: string;
+  contact2T2?: string;
   residents?: ResidentCreateDto[];
   contract?: ContractCreateDto;
   bail?: Bail;
