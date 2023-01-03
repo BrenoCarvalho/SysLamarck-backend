@@ -12,11 +12,7 @@ export class UserService {
   ) {}
 
   async findOne(username: string): Promise<User | undefined> {
-    const data = await this.userRepository.findOneBy({ username: username });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...user } = data;
-
-    return user;
+    return await this.userRepository.findOneBy({ username: username });
   }
 
   async findAll(): Promise<User[]> {

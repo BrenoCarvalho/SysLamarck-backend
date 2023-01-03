@@ -25,7 +25,12 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get(':username')
   async findOne(@Param() params): Promise<User> {
-    return this.userService.findOne(params.username);
+    const data = await this.userService.findOne(params.username);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...user } = data;
+
+    return user;
   }
 
   @Post()
