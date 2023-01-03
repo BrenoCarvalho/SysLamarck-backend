@@ -123,33 +123,33 @@ export class BailService {
     bail.BailPropertyDistrict = data.BailPropertyDistrict;
     bail.BailPropertyAddress = data.BailPropertyAddress;
     bail.BailPropertyRegistrationNumber = data.BailPropertyRegistrationNumber;
-    bail.G2fullName = data.G2fullName;
-    bail.G2birthDate = data.G2birthDate;
-    bail.G2rg = data.G2rg;
-    bail.G2cpf = data.G2cpf;
-    bail.G2nationality = data.G2nationality;
-    bail.G2maritalStatus = data.G2maritalStatus;
-    bail.G2profession = data.G2profession;
-    bail.G2email = data.G2email;
-    bail.G2contact1 = data.G2contact1;
-    bail.G2contact2 = data.G2contact2;
-    bail.G2cep = data.G2cep;
-    bail.G2city = data.G2city;
-    bail.G2district = data.G2district;
-    bail.G2address = data.G2address;
-    bail.G2SpouseFullName = data.G2SpouseFullName;
-    bail.G2SpouseBirthDate = data.G2SpouseBirthDate;
-    bail.G2SpouseRg = data.G2SpouseRg;
-    bail.G2SpouseCpf = data.G2SpouseCpf;
-    bail.G2SpouseNationality = data.G2SpouseNationality;
-    bail.G2SpouseProfession = data.G2SpouseProfession;
-    bail.G2SpouseContact1 = data.G2SpouseContact1;
-    bail.G2BailPropertyCep = data.G2BailPropertyCep;
-    bail.G2BailPropertyCity = data.G2BailPropertyCity;
-    bail.G2BailPropertyDistrict = data.G2BailPropertyDistrict;
-    bail.G2BailPropertyAddress = data.G2BailPropertyAddress;
-    bail.G2BailPropertyRegistrationNumber =
-      data.G2BailPropertyRegistrationNumber;
+    bail.fullNameG2 = data.fullNameG2;
+    bail.birthDateG2 = data.birthDateG2;
+    bail.rgG2 = data.rgG2;
+    bail.cpfG2 = data.cpfG2;
+    bail.nationalityG2 = data.nationalityG2;
+    bail.maritalStatusG2 = data.maritalStatusG2;
+    bail.professionG2 = data.professionG2;
+    bail.emailG2 = data.emailG2;
+    bail.contact1G2 = data.contact1G2;
+    bail.contact2G2 = data.contact2G2;
+    bail.cepG2 = data.cepG2;
+    bail.cityG2 = data.cityG2;
+    bail.districtG2 = data.districtG2;
+    bail.addressG2 = data.addressG2;
+    bail.SpouseFullNameG2 = data.SpouseFullNameG2;
+    bail.SpouseBirthDateG2 = data.SpouseBirthDateG2;
+    bail.SpouseRgG2 = data.SpouseRgG2;
+    bail.SpouseCpfG2 = data.SpouseCpfG2;
+    bail.SpouseNationalityG2 = data.SpouseNationalityG2;
+    bail.SpouseProfessionG2 = data.SpouseProfessionG2;
+    bail.SpouseContact1G2 = data.SpouseContact1G2;
+    bail.BailPropertyCepG2 = data.BailPropertyCepG2;
+    bail.BailPropertyCityG2 = data.BailPropertyCityG2;
+    bail.BailPropertyDistrictG2 = data.BailPropertyDistrictG2;
+    bail.BailPropertyAddressG2 = data.BailPropertyAddressG2;
+    bail.BailPropertyRegistrationNumberG2 =
+      data.BailPropertyRegistrationNumberG2;
 
     return this.bailRepository
       .save(bail)
