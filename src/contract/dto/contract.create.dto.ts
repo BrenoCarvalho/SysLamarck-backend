@@ -12,4 +12,5 @@ export interface ContractCreateDto {
   payday: string;
   start: Date;
   end: Date;
+  firstPayment: Date;
 }

@@ -106,6 +106,7 @@ export class ContractService {
     contract.payday = data.payday;
     contract.start = data.start;
     contract.end = data.end;
+    contract.firstPayment = data.firstPayment;
 
     return this.contractRepository
       .save(contract)

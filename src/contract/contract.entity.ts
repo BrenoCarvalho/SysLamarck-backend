@@ -35,11 +35,14 @@ export class Contract {
   @Column({ length: 50, nullable: true })
   payday: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', nullable: true })
   start: Date;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', nullable: true })
   end: Date;
+
+  @Column({ type: 'date', nullable: true })
+  firstPayment: Date;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -16,7 +16,7 @@ export interface PropertyCreateDto {
   leaseAmount: string;
   sellValue: string;
   vacant: boolean;
-  registrationValue: string;
+  registrationNumber: string;
   cityCode: string;
   IPTUNumber: string;
   IntegralIPTUValue: string;

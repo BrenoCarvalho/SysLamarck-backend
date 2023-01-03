@@ -63,7 +63,7 @@ export class Property {
   vacant: boolean;
 
   @Column({ length: 100, nullable: true })
-  registrationValue: string;
+  registrationNumber: string;
 
   @Column({ length: 100, nullable: true })
   cityCode: string;

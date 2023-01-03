@@ -37,27 +37,24 @@ export class TenantService {
       await this.residentService.delete(value);
     });
 
-    const contracts = await this.contractService.findBy({
-      contractCode: tenant?.contractCode,
-    });
-
-    contracts.map(async (value) => {
-      await this.contractService.delete(value.contractCode);
-    });
-
-    const bails = await this.bailService.findBy({
-      bailCode: tenant?.bailCode,
-    });
-
-    bails.map(async (value) => {
-      await this.bailService.delete(value.bailCode);
-    });
+    await this.contractService.delete(tenant?.contractCode);
+    await this.bailService.delete(tenant?.bailCode);
 
     return (await this.tenantRepository.delete(tenantCode)).affected;
   }
 
   async findOne(tenantCode: number): Promise<Tenant> {
-    return this.tenantRepository.findOneBy({ tenantCode: tenantCode });
+    const response = await this.tenantRepository.findOneBy({
+      tenantCode: tenantCode,
+    });
+
+    response.contract = await this.contractService.findOne(
+      response?.contractCode,
+    );
+
+    response.bail = await this.bailService.findOne(response?.bailCode);
+
+    return response;
   }
 
   async update(tenantCode: number, data: TenantCreateDto): Promise<string> {
@@ -107,9 +104,11 @@ export class TenantService {
 
     const tenantsCode = [];
 
-    response.map((value) => {
-      tenantsCode.push(value.tenantCode);
-    });
+    if (response?.length) {
+      response.map((value) => {
+        tenantsCode.push(value.tenantCode);
+      });
+    }
 
     let code = null;
     let stop = false;
@@ -144,24 +143,26 @@ export class TenantService {
     tenant.email = data?.email;
     tenant.contact1 = data?.contact1;
     tenant.contact2 = data?.contact2;
-    tenant.T2fullName = data?.T2fullName;
-    tenant.T2birthDate = data?.T2birthDate;
-    tenant.T2rg = data?.T2rg;
-    tenant.T2cpf = data?.T2cpf;
-    tenant.T2nationality = data?.T2nationality;
-    tenant.T2maritalStatus = data?.T2maritalStatus;
-    tenant.T2profession = data?.T2profession;
-    tenant.T2email = data?.T2email;
-    tenant.T2contact1 = data?.T2contact1;
-    tenant.T2contact2 = data?.T2contact2;
+    tenant.fullNameT2 = data?.fullNameT2;
+    tenant.birthDateT2 = data?.birthDateT2;
+    tenant.rgT2 = data?.rgT2;
+    tenant.cpfT2 = data?.cpfT2;
+    tenant.nationalityT2 = data?.nationalityT2;
+    tenant.maritalStatusT2 = data?.maritalStatusT2;
+    tenant.professionT2 = data?.professionT2;
+    tenant.emailT2 = data?.emailT2;
+    tenant.contact1T2 = data?.contact1T2;
+    tenant.contact2T2 = data?.contact2T2;
 
     const residentsCode = [];
 
-    data?.residents.map(async (value) => {
-      residentsCode.push(
-        (await this.residentService.create(value)).residentCode,
-      );
-    });
+    if (data?.residents?.length) {
+      data?.residents.map(async (value) => {
+        residentsCode.push(
+          (await this.residentService.create(value)).residentCode,
+        );
+      });
+    }
 
     tenant.residents = residentsCode;
 

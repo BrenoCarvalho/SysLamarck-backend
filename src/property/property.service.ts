@@ -40,7 +40,13 @@ export class PropertyService {
   }
 
   async delete(id: number): Promise<number> {
-    const tenants = await this.tenantService.findBy({ propertyId: id });
+    const propertyCode = await (
+      await this.propertyRepository.findOneBy({ id })
+    ).propertyCode;
+
+    const tenants = await this.tenantService.findBy({
+      propertyCode: propertyCode,
+    });
 
     tenants.map(async (value) => {
       await this.tenantService.delete(value?.tenantCode);
@@ -151,7 +157,7 @@ export class PropertyService {
     property.leaseAmount = data.leaseAmount;
     property.sellValue = data.sellValue;
     property.vacant = data.vacant;
-    property.registrationValue = data.registrationValue;
+    property.registrationNumber = data.registrationNumber;
     property.cityCode = data.cityCode;
     property.IPTUNumber = data.IPTUNumber;
     property.IntegralIPTUValue = data.IntegralIPTUValue;
