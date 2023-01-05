@@ -27,10 +27,13 @@ export class UserController {
   async findOne(@Param() params): Promise<User> {
     const data = await this.userService.findOne(params.username);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...user } = data;
+    if (data?.password) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...user } = data;
+      return user;
+    }
 
-    return user;
+    return data;
   }
 
   @Post()
