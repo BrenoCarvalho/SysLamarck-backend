@@ -1,6 +1,12 @@
 import { Bail } from 'src/bail/bail.entity';
 import { ContractCreateDto } from 'src/contract/dto/contract.create.dto';
-import { ResidentCreateDto } from 'src/resident/dto/resident.create.dto';
+
+export interface Resident {
+  fullName: string;
+  rg: string;
+  cpf: string;
+  contact1: string;
+}
 
 export interface TenantCreateDto extends ContractCreateDto, Bail {
   propertyId?: number;
@@ -25,5 +31,5 @@ export interface TenantCreateDto extends ContractCreateDto, Bail {
   emailT2?: string;
   contact1T2?: string;
   contact2T2?: string;
-  residents?: ResidentCreateDto[];
+  residents?: Resident[];
 }

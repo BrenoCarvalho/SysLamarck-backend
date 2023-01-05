@@ -1,6 +1,5 @@
 import { Bail } from 'src/bail/bail.entity';
 import { Contract } from 'src/contract/contract.entity';
-import { Resident } from 'src/resident/resident.entity';
 import { Entity, Column, CreateDateColumn, PrimaryColumn } from 'typeorm';
 
 @Entity()
@@ -74,8 +73,8 @@ export class Tenant {
   @Column({ length: 100, nullable: true })
   contact2T2: string;
 
-  @Column('simple-array')
-  residents: number[] | Resident[];
+  @Column({ length: 2048 })
+  residents: string;
 
   @Column({ type: 'int', nullable: true })
   contract: number | Contract;
