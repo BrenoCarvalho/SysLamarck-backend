@@ -73,8 +73,8 @@ export class Tenant {
   @Column({ length: 100, nullable: true })
   contact2T2: string;
 
-  @Column('simple-array')
-  residents: number[];
+  @Column({ length: 2048 })
+  residents: string;
 
   @Column({ type: 'int', nullable: true })
   contract: number | Contract;

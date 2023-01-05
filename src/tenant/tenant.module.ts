@@ -5,10 +5,9 @@ import { TenantService } from './tenant.service';
 import { TenantController } from './tenant.controller';
 import { ContractModule } from 'src/contract/contract.module';
 import { BailModule } from 'src/bail/bail.module';
-import { ResidentModule } from 'src/resident/resident.module';
 
 @Module({
-  imports: [DatabaseModule, ResidentModule, ContractModule, BailModule],
+  imports: [DatabaseModule, ContractModule, BailModule],
   controllers: [TenantController],
   providers: [...tenantProviders, TenantService],
   exports: [TenantService],

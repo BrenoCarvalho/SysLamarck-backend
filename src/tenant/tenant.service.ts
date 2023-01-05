@@ -10,7 +10,6 @@ import { Tenant } from './tenant.entity';
 import { TenantCreateDto } from './dto/tenant.create.dto';
 import { ContractService } from 'src/contract/contract.service';
 import { BailService } from 'src/bail/bail.service';
-import { ResidentService } from 'src/resident/resident.service';
 
 @Injectable()
 export class TenantService {
@@ -19,7 +18,6 @@ export class TenantService {
     private tenantRepository: Repository<Tenant>,
     private contractService: ContractService,
     private bailService: BailService,
-    private residentService: ResidentService,
   ) {}
 
   async findAll(): Promise<Tenant[]> {
@@ -37,6 +35,8 @@ export class TenantService {
 
     response.bail = await this.bailService.findOne(Number(response?.bail));
 
+    response.residents = JSON.parse(response.residents);
+
     return response;
   }
 
@@ -47,11 +47,6 @@ export class TenantService {
   async delete(tenantCode: number): Promise<number> {
     const tenant = await this.findOne(tenantCode);
 
-    if (tenant?.residents?.length) {
-      tenant?.residents.map(async (value) => {
-        await this.residentService.delete(value);
-      });
-    }
     const contract: any = tenant.contract;
     await this.contractService.delete(contract?.contractCode);
 
@@ -85,6 +80,7 @@ export class TenantService {
       end: data?.end,
       firstPayment: data?.firstPayment,
     });
+
     await this.bailService.update(Number(tenant?.bail), {
       type: data?.type,
       escrowValue: data?.escrowValue,
@@ -143,12 +139,6 @@ export class TenantService {
       bailPropertyRegistrationNumberG2: data?.bailPropertyRegistrationNumberG2,
     });
 
-    // data?.residents.map(async (value) => {
-    //   await this.residentService.update(value.residentCode, value);
-    // });
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-
     const newData = {
       propertyId: data?.propertyId,
       propertyCode: data?.propertyCode,
@@ -172,6 +162,7 @@ export class TenantService {
       emailT2: data?.emailT2,
       contact1T2: data?.contact1T2,
       contact2T2: data?.contact2T2,
+      residents: JSON.stringify(data?.residents),
     };
 
     return this.tenantRepository
@@ -248,18 +239,7 @@ export class TenantService {
     tenant.emailT2 = data?.emailT2;
     tenant.contact1T2 = data?.contact1T2;
     tenant.contact2T2 = data?.contact2T2;
-
-    const residentsCode = [];
-
-    if (data?.residents?.length) {
-      data?.residents.map(async (value) => {
-        residentsCode.push(
-          (await this.residentService.create(value)).residentCode,
-        );
-      });
-    }
-
-    tenant.residents = residentsCode;
+    tenant.residents = JSON.stringify(data?.residents);
 
     tenant.contract = (await this.contractService.create(data)).contractCode;
 
