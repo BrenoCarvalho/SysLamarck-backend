@@ -37,6 +37,16 @@ export class TenantService {
 
     response.bail = await this.bailService.findOne(Number(response?.bail));
 
+    const wheres = [];
+
+    response?.residents?.map((code: any) => {
+      wheres.push({ tenantCode: Number(code) });
+    });
+
+    response.residents = wheres.length
+      ? await this.residentService.find({ wheres })
+      : [];
+
     return response;
   }
 

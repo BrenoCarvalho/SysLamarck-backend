@@ -27,12 +27,18 @@ export class ResidentService {
     return response.affected;
   }
 
+  async find(query: object) {
+    return await this.residentRepository.find(query);
+  }
+
   async findBy(by: object): Promise<Resident[]> {
     return await this.residentRepository.findBy(by);
   }
 
   async findOne(residentCode: number): Promise<Resident> {
-    return this.residentRepository.findOneBy({ residentCode: residentCode });
+    return await this.residentRepository.findOneBy({
+      residentCode: residentCode,
+    });
   }
 
   async update(residentCode: number, data: ResidentCreateDto): Promise<string> {
