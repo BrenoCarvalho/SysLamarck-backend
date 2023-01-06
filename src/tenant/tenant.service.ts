@@ -4,12 +4,14 @@ import {
   HttpException,
   HttpStatus,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Tenant } from './tenant.entity';
 import { TenantCreateDto } from './dto/tenant.create.dto';
 import { ContractService } from 'src/contract/contract.service';
 import { BailService } from 'src/bail/bail.service';
+import { PropertyService } from 'src/property/property.service';
 
 @Injectable()
 export class TenantService {
@@ -18,6 +20,8 @@ export class TenantService {
     private tenantRepository: Repository<Tenant>,
     private contractService: ContractService,
     private bailService: BailService,
+    @Inject(forwardRef(() => PropertyService))
+    private propertyService: PropertyService,
   ) {}
 
   async findAll(): Promise<Tenant[]> {
@@ -244,6 +248,15 @@ export class TenantService {
     tenant.contract = (await this.contractService.create(data)).contractCode;
 
     tenant.bail = (await this.bailService.create(data)).bailCode;
+
+    const property = await this.propertyService.findOneBy({
+      propertyCode: data?.propertyCode,
+    });
+
+    await this.propertyService.update(property.id, {
+      locatorCode: property.locatorCode,
+      vacant: false,
+    });
 
     return this.tenantRepository
       .save(tenant)
