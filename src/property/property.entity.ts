@@ -32,7 +32,7 @@ export class Property {
   @Column({ length: 100, nullable: true })
   address: string;
 
-  @Column({ length: 100, nullable: true })
+  @Column({ length: 255, nullable: true })
   propertyDescription: string;
 
   @Column({ length: 100, nullable: true })

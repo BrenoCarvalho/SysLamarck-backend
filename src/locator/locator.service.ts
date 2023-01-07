@@ -97,8 +97,9 @@ export class LocatorService {
   async create(data: LocatorCreateDto): Promise<string> {
     const locator = new Locator();
 
-    locator.locatorCode =
-      data?.locatorCode | (await this.generateLocatorCode());
+    locator.locatorCode = data.locatorCode
+      ? data.locatorCode
+      : await this.generateLocatorCode();
     locator.provisionService = data.provisionService;
     locator.fullName = data.fullName;
     locator.birthDate = data.birthDate;
