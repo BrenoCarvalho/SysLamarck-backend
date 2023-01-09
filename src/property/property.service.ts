@@ -140,7 +140,9 @@ export class PropertyService {
 
     property.id = await this.generatePropertyId();
     property.locatorCode = data.locatorCode;
-    property.property = await this.generateProperty(data.locatorCode);
+    property.property = data?.property
+      ? data.property
+      : await this.generateProperty(data.locatorCode);
     property.propertyCode = `${String(data.locatorCode).padStart(
       3,
       '0',
