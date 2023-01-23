@@ -1,6 +1,6 @@
 export interface BailCreateDto {
   bailCode?: number;
-  type: string;
+  type?: string;
   escrowValue?: string;
   militaryInsurance?: string;
   fullNameG1?: string;

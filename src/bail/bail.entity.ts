@@ -5,7 +5,7 @@ export class Bail {
   @PrimaryColumn('int')
   bailCode: number;
 
-  @Column({ length: 50 })
+  @Column({ length: 50, nullable: true })
   type: string;
 
   @Column({ length: 50, nullable: true })
