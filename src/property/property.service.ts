@@ -25,8 +25,8 @@ export class PropertyService {
     private tenantService: TenantService,
   ) {}
 
-  async findAll(): Promise<Property[]> {
-    return this.propertyRepository.find();
+  async findAll(conditions?: any): Promise<Property[]> {
+    return this.propertyRepository.find(conditions);
   }
 
   async findBy(by: object): Promise<Property[]> {

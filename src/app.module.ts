@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { PropertyModule } from './property/property.module';
 import { TenantModule } from './tenant/tenant.module';
+import { ReportModule } from './report/report.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TenantModule } from './tenant/tenant.module';
     TenantModule,
     ConfigModule.forRoot(),
     AuthModule,
+    ReportModule,
   ],
   controllers: [AppController],
   providers: [AppService],
