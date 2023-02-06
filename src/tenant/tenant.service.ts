@@ -88,7 +88,8 @@ export class TenantService {
     await this.bailService.update(Number(tenant?.bail), {
       type: data?.type,
       escrowValue: data?.escrowValue,
-      militaryInsurance: data?.militaryInsurance,
+      warrantyTerm: data?.warrantyTerm,
+      capitalizationTitle: data?.capitalizationTitle,
       fullNameG1: data?.fullNameG1,
       birthDateG1: data?.birthDateG1,
       rgG1: data?.rgG1,

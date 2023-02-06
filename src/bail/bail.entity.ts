@@ -12,7 +12,10 @@ export class Bail {
   escrowValue: string;
 
   @Column({ length: 50, nullable: true })
-  militaryInsurance: string;
+  warrantyTerm: string;
+
+  @Column({ length: 50, nullable: true })
+  capitalizationTitle: string;
 
   @Column({ length: 100, nullable: true })
   fullNameG1: string;

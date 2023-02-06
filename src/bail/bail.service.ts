@@ -96,7 +96,8 @@ export class BailService {
     bail.bailCode = await this.generateBailCode();
     bail.type = data.type;
     bail.escrowValue = data.escrowValue;
-    bail.militaryInsurance = data.militaryInsurance;
+    bail.warrantyTerm = data?.warrantyTerm;
+    bail.capitalizationTitle = data?.capitalizationTitle;
     bail.fullNameG1 = data.fullNameG1;
     bail.birthDateG1 = data.birthDateG1;
     bail.rgG1 = data.rgG1;
