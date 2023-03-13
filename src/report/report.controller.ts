@@ -26,11 +26,12 @@ export class ReportController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/contractsCompletedByPeriod')
-  async contractsCompletedByPeriod(@Body() body): Promise<Property[]> {
-    return this.reportService.contractsCompletedByPeriod(
+  @Post('/contractsByPeriod')
+  async contractsByPeriod(@Body() body): Promise<Property[]> {
+    return this.reportService.contractsByPeriod(
       body?.startDate,
       body?.endDate,
+      body?.mode,
     );
   }
 }

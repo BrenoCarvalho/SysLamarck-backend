@@ -20,6 +20,10 @@ export class ContractService {
     return this.contractRepository.find();
   }
 
+  async find(condition: object) {
+    return this.contractRepository.find(condition);
+  }
+
   async findBy(by: object): Promise<Contract[]> {
     return await this.contractRepository.findBy(by);
   }
