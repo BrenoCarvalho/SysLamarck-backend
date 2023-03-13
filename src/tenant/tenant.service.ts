@@ -254,8 +254,8 @@ export class TenantService {
       propertyCode: data?.propertyCode,
     });
 
-    await this.propertyService.update(property.id, {
-      locatorCode: property.locatorCode,
+    await this.propertyService.update(property?.id, {
+      locatorCode: property?.locatorCode,
       vacant: false,
     });
 
