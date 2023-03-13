@@ -146,12 +146,14 @@ export class ReportService {
         )?.propertyType;
 
         data.push({
-          propertyCode: tenant?.propertyCode,
-          locatorName: locatorName,
-          tenantName: tenant?.fullName,
-          startContract: contract?.start,
-          endContract: contract?.end,
-          propertyType: propertyType,
+          propertyCode: tenant?.propertyCode
+            ? tenant?.propertyCode
+            : 'Não definido',
+          locatorName: locatorName ? locatorName : 'Não definido',
+          tenantName: tenant?.fullName ? tenant?.fullName : 'Não definido',
+          startContract: contract?.start ? contract?.start : 'Não definido',
+          endContract: contract?.end ? contract?.end : 'Não definido',
+          propertyType: propertyType ? propertyType : 'Não definido',
         });
       }),
     );
