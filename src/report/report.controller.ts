@@ -34,4 +34,16 @@ export class ReportController {
       body?.mode,
     );
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/rgiEdp')
+  async rgiEdp(): Promise<Property[]> {
+    return this.reportService.rgiEdp();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/propertyTax')
+  async propertyTax(): Promise<Property[]> {
+    return this.reportService.propertyTax();
+  }
 }

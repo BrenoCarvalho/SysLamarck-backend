@@ -160,4 +160,46 @@ export class ReportService {
 
     return data;
   }
+
+  async rgiEdp(): Promise<any> {
+    const properties = await this.propertyService.findAll();
+    const propertiesFormatted = [];
+
+    await Promise.all(
+      properties.map((value) => {
+        propertiesFormatted.push({
+          locatorCode: value?.locatorCode,
+          propertyCode: value?.propertyCode,
+          address: value?.address,
+          rgi: value?.rgi,
+          supply: value?.supply,
+          edpInstallation: value?.edpInstallation,
+        });
+      }),
+    );
+
+    return propertiesFormatted;
+  }
+
+  async propertyTax(): Promise<any> {
+    const properties = await this.propertyService.findAll();
+    const data = [];
+
+    await Promise.all(
+      properties?.map(async (value) => {
+        const locator = await this.locatorService.findOne(value?.locatorCode);
+
+        data.push({
+          locatorCode: value?.locatorCode,
+          propertyCode: value?.propertyCode,
+          fullNameLocator: locator?.fullName,
+          cpf: locator?.cpf,
+          address: value?.address,
+          iptu: value?.IPTUNumber,
+        });
+      }),
+    );
+
+    return data;
+  }
 }
