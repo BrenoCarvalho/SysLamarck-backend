@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Contract } from 'src/contract/contract.entity';
 import { ContractService } from 'src/contract/contract.service';
 import { LocatorService } from 'src/locator/locator.service';
 import { PropertyService } from 'src/property/property.service';
@@ -106,11 +107,42 @@ export class ReportService {
     };
   }
 
+  async contractsByMonth(month: string, type: 'start' | 'end'): Promise<any> {
+    const contracts = [];
+
+    await Promise.all(
+      (
+        await this.contractService.findByMonth(month, type)
+      )?.map(async (contract: Contract) => {
+        const tenant = (
+          await this.tenantService.findBy({
+            contract: contract.contractCode,
+          })
+        )[0];
+
+        contracts.push({
+          locatorCode: Number(tenant.propertyCode.substring(0, 3)),
+          propertyCode: tenant.propertyCode,
+          fullName: tenant.fullName,
+          index: contract.index,
+          firstPayment: contract.firstPayment,
+          reajust: contract.reajust,
+          start: contract.start,
+          end: contract.end,
+          goal: contract.goal,
+        });
+      }),
+    );
+
+    return contracts;
+  }
+
   async contractsByPeriod(
     startDate: string,
     endDate: string,
     mode: number,
   ): Promise<any> {
+    console.log(startDate, endDate);
     const contracts = await this.contractService.findBy(
       mode == 1
         ? {

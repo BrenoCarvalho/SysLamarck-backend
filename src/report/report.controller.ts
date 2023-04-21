@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { Property } from 'src/property/property.entity';
 import { ReportService } from './report.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -23,6 +31,12 @@ export class ReportController {
   @Get('/propertyByLocator/:locatorCode')
   async propertyByLocator(@Param() params): Promise<Property[]> {
     return this.reportService.propertyByLocator(params?.locatorCode);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/contractsByMonth')
+  async readjustmentContracts(@Query() query): Promise<Property[]> {
+    return this.reportService.contractsByMonth(query.month, query.type);
   }
 
   @UseGuards(JwtAuthGuard)

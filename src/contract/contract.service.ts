@@ -16,12 +16,22 @@ export class ContractService {
     private contractRepository: Repository<Contract>,
   ) {}
 
+  async findByMonth(
+    month: string | number,
+    type: 'start' | 'end',
+  ): Promise<any> {
+    return await this.contractRepository
+      .createQueryBuilder()
+      .where(`MONTH(${type}) = :month`, { month })
+      .getMany();
+  }
+
   async findAll(): Promise<Contract[]> {
-    return this.contractRepository.find();
+    return await this.contractRepository.find();
   }
 
   async find(condition: object) {
-    return this.contractRepository.find(condition);
+    return await this.contractRepository.find(condition);
   }
 
   async findBy(by: object): Promise<Contract[]> {
