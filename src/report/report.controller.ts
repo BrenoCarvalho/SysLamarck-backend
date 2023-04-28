@@ -60,4 +60,10 @@ export class ReportController {
   async propertyTax(): Promise<Property[]> {
     return this.reportService.propertyTax();
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/registrationForm')
+  async registrationForm(@Query() query): Promise<any> {
+    return this.reportService.registrationForm(query.tenantCode);
+  }
 }

@@ -234,4 +234,18 @@ export class ReportService {
 
     return data;
   }
+
+  async registrationForm(tenantCode: number): Promise<any> {
+    const tenant = await this.tenantService.findOne(tenantCode);
+
+    const property = await this.propertyService.findOneBy({
+      propertyCode: tenant.propertyCode,
+    });
+
+    const locator = await this.locatorService.findOne(
+      Number(tenant.propertyCode.slice(0, 3)),
+    );
+
+    return { tenant, property, locator };
+  }
 }
