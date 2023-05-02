@@ -218,11 +218,10 @@ export class TenantService {
     return code;
   }
 
-  async create(data: TenantCreateDto): Promise<string> {
+  async create(data: TenantCreateDto): Promise<Tenant> {
     const tenant = new Tenant();
 
     tenant.tenantCode = await this.generateTenantCode();
-    tenant.propertyId = data?.propertyId;
     tenant.propertyCode = data?.propertyCode;
     tenant.fullName = data?.fullName;
     tenant.birthDate = data?.birthDate;
@@ -265,13 +264,17 @@ export class TenantService {
         const msg = `Tenant ${tenant.tenantCode} created as succesfily`;
         console.log(msg);
 
-        return msg;
+        return tenant;
       })
       .catch(async (error) => {
         console.log(error.driverError.sqlMessage);
 
         await this.contractService.delete(Number(tenant?.contract));
         await this.bailService.delete(Number(tenant?.bail));
+        await this.propertyService.update(property?.id, {
+          locatorCode: property?.locatorCode,
+          vacant: true,
+        });
 
         throw new HttpException(
           error.driverError.sqlMessage,

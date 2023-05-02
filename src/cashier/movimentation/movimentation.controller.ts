@@ -1,20 +1,24 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { MovimentationService } from './movimentation.service';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { MovimentationCreateDto } from './dto/movimentation.create.dto';
+import { Movimentation } from './movimentation.entity';
 
 @Controller('movimentation')
 export class MovimentationController {
   constructor(private readonly movimentationService: MovimentationService) {}
 
-  @Get()
-  async findAll(): Promise<any> {
-    return 'hello';
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async create(@Body() data: MovimentationCreateDto): Promise<string> {
+    return this.movimentationService.create(data);
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Get()
-  // async findAll(): Promise<Property[]> {
-  //   return this.propertyService.findAll();
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async findAll(): Promise<Movimentation[]> {
+    return this.movimentationService.findAll();
+  }
 
   // @UseGuards(JwtAuthGuard)
   // @Get('findById/:id')

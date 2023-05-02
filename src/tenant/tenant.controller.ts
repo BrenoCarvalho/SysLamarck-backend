@@ -40,7 +40,7 @@ export class TenantController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() data: TenantCreateDto): Promise<string> {
+  async create(@Body() data: TenantCreateDto): Promise<Tenant> {
     return await this.tenantService.create(data);
   }
 

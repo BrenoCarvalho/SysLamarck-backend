@@ -19,7 +19,7 @@ import { CashierModule } from './cashier/cashier.module';
     ConfigModule.forRoot(),
     AuthModule,
     ReportModule,
-    // CashierModule,
+    CashierModule,
   ],
   controllers: [AppController],
   providers: [AppService],

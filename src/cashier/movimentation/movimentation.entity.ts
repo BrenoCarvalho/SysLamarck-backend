@@ -1,20 +1,25 @@
-import { Entity, Column, CreateDateColumn, PrimaryColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  CreateDateColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Movimentation {
-  @PrimaryColumn('int')
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  movimentation: string;
+  description: string;
 
   @Column('date')
   date: Date;
 
-  @Column('float')
+  @Column('float', { nullable: true })
   credit: number;
 
-  @Column('float')
+  @Column('float', { nullable: true })
   debit: number;
 
   @CreateDateColumn()

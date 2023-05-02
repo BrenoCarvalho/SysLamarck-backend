@@ -7,13 +7,10 @@ export class Tenant {
   @PrimaryColumn('int')
   tenantCode: number;
 
-  @Column({ type: 'int', nullable: true })
-  propertyId: number;
-
   @Column({ length: 10 })
   propertyCode: string;
 
-  @Column({ length: 100, nullable: true })
+  @Column({ length: 100 })
   fullName: string;
 
   @Column({ type: 'date', nullable: true })

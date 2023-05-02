@@ -1,6 +1,7 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Movimentation } from './movimentation.entity';
+import { MovimentationCreateDto } from './dto/movimentation.create.dto';
 
 @Injectable()
 export class MovimentationService {
@@ -119,59 +120,33 @@ export class MovimentationService {
   //   return locator?.fullName;
   // }
 
-  // async create(data: PropertyCreateDto): Promise<string> {
-  //   const property = new Property();
+  async findAll(conditions?: any): Promise<Movimentation[]> {
+    return this.movimentationRepository.find(conditions);
+  }
 
-  //   property.id = await this.generatePropertyId();
-  //   property.locatorCode = data.locatorCode;
-  //   property.property = data?.property
-  //     ? data.property
-  //     : await this.generateProperty(data.locatorCode);
-  //   property.propertyCode = `${String(data.locatorCode).padStart(
-  //     3,
-  //     '0',
-  //   )}${String(property.property).padStart(3, '0')}`;
-  //   property.locatorName = await this.getLocatorName(data.locatorCode);
-  //   property.propertyType = data.propertyType;
-  //   property.cep = data.cep;
-  //   property.city = data.city;
-  //   property.district = data.district;
-  //   property.address = data.address;
-  //   property.propertyDescription = data.propertyDescription;
-  //   property.IPTUPayer = data.IPTUPayer;
-  //   property.DIMOBDeclaration = data.DIMOBDeclaration;
-  //   property.goalOfProperty = data.goalOfProperty;
-  //   property.leaseFee = data.leaseFee;
-  //   property.administrationTax = data.administrationTax;
-  //   property.integralValue = data.integralValue;
-  //   property.leaseAmount = data.leaseAmount;
-  //   property.sellValue = data.sellValue;
-  //   property.vacant = data.vacant;
-  //   property.registrationNumber = data.registrationNumber;
-  //   property.cityCode = data.cityCode;
-  //   property.IPTUNumber = data.IPTUNumber;
-  //   property.IntegralIPTUValue = data.IntegralIPTUValue;
-  //   property.numberInstallments = data.numberInstallments;
-  //   property.installmentsIPTUValue = data.installmentsIPTUValue;
-  //   property.edpInstallation = data.edpInstallation;
-  //   property.rgi = data.rgi;
-  //   property.supply = data.supply;
+  async create(data: MovimentationCreateDto): Promise<string> {
+    const movimentation = new Movimentation();
 
-  //   return this.propertyRepository
-  //     .save(property)
-  //     .then(() => {
-  //       const msg = `Property ${property.id} created as succesfily`;
-  //       console.log(msg);
+    movimentation.description = data?.description;
+    movimentation.date = data?.date;
+    movimentation.credit = data?.credit;
+    movimentation.debit = data?.debit;
 
-  //       return msg;
-  //     })
-  //     .catch((error) => {
-  //       console.log(error.driverError.sqlMessage);
+    return this.movimentationRepository
+      .save(movimentation)
+      .then(() => {
+        const msg = `Movimentation ${movimentation.id} created as succesfily`;
+        console.log(msg);
 
-  //       throw new HttpException(
-  //         error.driverError.sqlMessage,
-  //         HttpStatus.INTERNAL_SERVER_ERROR,
-  //       );
-  //     });
-  // }
+        return msg;
+      })
+      .catch((error) => {
+        console.log(error.driverError.sqlMessage);
+
+        throw new HttpException(
+          error.driverError.sqlMessage,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      });
+  }
 }

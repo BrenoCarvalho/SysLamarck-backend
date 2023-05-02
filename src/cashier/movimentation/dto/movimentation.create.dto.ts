@@ -1,6 +1,6 @@
 export interface MovimentationCreateDto {
-  movimentation: string;
-  date: number;
+  description: string;
+  date: Date;
   credit?: number;
-  debit?: string;
+  debit?: number;
 }
