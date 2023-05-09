@@ -129,8 +129,8 @@ export class MovimentationService {
 
     movimentation.description = data?.description;
     movimentation.date = data?.date;
-    movimentation.credit = data?.credit;
-    movimentation.debit = data?.debit;
+    movimentation.credit = Number(data?.credit) || null;
+    movimentation.debit = Number(data?.debit) || null;
 
     return this.movimentationRepository
       .save(movimentation)
