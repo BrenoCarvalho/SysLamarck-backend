@@ -1,5 +1,5 @@
 export interface LocatorCreateDto {
-  locatorCode: number;
+  id?: number;
   provisionService: string;
   fullName: string;
   birthDate: Date;

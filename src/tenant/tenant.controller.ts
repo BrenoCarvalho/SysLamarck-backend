@@ -24,9 +24,9 @@ export class TenantController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(':tenantCode')
+  @Get(':id')
   async findOne(@Param() params): Promise<Tenant> {
-    return this.tenantService.findOne(params.tenantCode);
+    return this.tenantService.findOne(params.id);
   }
 
   @UseGuards(JwtAuthGuard)

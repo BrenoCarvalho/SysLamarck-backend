@@ -1,9 +1,19 @@
-import { Entity, Column, CreateDateColumn, PrimaryColumn } from 'typeorm';
+import { Property } from 'src/property/property.entity';
+import {
+  Entity,
+  Column,
+  CreateDateColumn,
+  PrimaryColumn,
+  OneToMany,
+} from 'typeorm';
 
 @Entity()
 export class Locator {
   @PrimaryColumn('int')
-  locatorCode: number;
+  id: number;
+
+  @OneToMany(() => Property, (property) => property.locator)
+  property: Property[];
 
   @Column({ length: 100, nullable: true })
   provisionService: string;

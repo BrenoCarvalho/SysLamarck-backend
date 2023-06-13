@@ -9,7 +9,6 @@ export interface Resident {
 }
 
 export interface TenantCreateDto extends ContractCreateDto, BailCreateDto {
-  propertyId?: number;
   propertyCode: string;
   fullName: string;
   birthDate: Date;

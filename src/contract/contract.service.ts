@@ -8,12 +8,15 @@ import {
 import { Repository } from 'typeorm';
 import { Contract } from './contract.entity';
 import { ContractCreateDto } from './dto/contract.create.dto';
+import { RentService } from 'src/cashier/rent/rent.service';
+import { Tenant } from 'src/tenant/tenant.entity';
 
 @Injectable()
 export class ContractService {
   constructor(
     @Inject('CONTRACT_REPOSITORY')
     private contractRepository: Repository<Contract>,
+    private rentService: RentService,
   ) {}
 
   async findByMonth(
@@ -38,30 +41,33 @@ export class ContractService {
     return await this.contractRepository.findBy(by);
   }
 
-  async delete(contractCode: number): Promise<number> {
-    const response = await this.contractRepository.delete(contractCode);
+  async delete(id: number): Promise<number> {
+    const response = await this.contractRepository.delete(id);
     console.log('contract deleted as successfully');
 
     return response.affected;
   }
 
-  async findOne(contractCode: number): Promise<Contract> {
-    return this.contractRepository.findOneBy({ contractCode: contractCode });
+  async findOne(id: number): Promise<Contract> {
+    return this.contractRepository.findOne({
+      where: { id },
+      relations: { tenant: true, rent: true },
+    });
   }
 
-  async update(contractCode: number, data: ContractCreateDto): Promise<string> {
+  async update(id: number, data: ContractCreateDto): Promise<string> {
     const contract = await this.contractRepository.findOneBy({
-      contractCode: contractCode,
+      id,
     });
 
     if (!contract) {
-      throw new NotFoundException(`Contract ${contractCode} not found`);
+      throw new NotFoundException(`Contract ${id} not found`);
     }
 
     return this.contractRepository
-      .update({ contractCode: contractCode }, data)
+      .update({ id }, data)
       .then(() => {
-        const msg = `Contract ${contractCode} updated as successfuly`;
+        const msg = `Contract ${id} updated as successfuly`;
         console.log(msg);
 
         return msg;
@@ -76,38 +82,29 @@ export class ContractService {
       });
   }
 
-  async generateContractCode(): Promise<number> {
-    const response = await this.contractRepository.find({
-      select: { contractCode: true },
-    });
+  async createInstallments(contract: Contract) {
+    const currentDate = new Date();
 
-    const contractsCode = [];
+    for (let month = 1; month <= contract.duration; month++) {
+      const dueDate = currentDate;
 
-    response.map((value) => {
-      contractsCode.push(value.contractCode);
-    });
+      if (month != 1) {
+        dueDate.setMonth(currentDate.getMonth() + month);
+      }
 
-    let code = null;
-    let stop = false;
-
-    if (Math.min(...contractsCode) > 1) {
-      code = 1;
-    } else {
-      contractsCode.map((value, index) => {
-        if (!stop && contractsCode[index + 1] != value + 1) {
-          code = value + 1;
-          stop = true;
-        }
+      await this.rentService.create({
+        contract: contract,
+        installmentNumber: month,
+        dueDate: dueDate,
+        amount: contract.leaseAmount,
+        status: 'Dv',
       });
     }
-
-    return code;
   }
 
-  async create(data: ContractCreateDto): Promise<Contract> {
+  async create(data: ContractCreateDto, tenant: Tenant): Promise<Contract> {
     const contract = new Contract();
 
-    contract.contractCode = await this.generateContractCode();
     contract.applyDiscount = data.applyDiscount;
     contract.withholdingTax = data.withholdingTax;
     contract.goal = data.goal;
@@ -116,22 +113,24 @@ export class ContractService {
     contract.reajust = data.reajust;
     contract.integralValue = data.integralValue;
     contract.leaseAmount = data.leaseAmount;
-    contract.duration = data.duration;
+    contract.duration = Number(data.duration);
     contract.payday = data.payday;
-    contract.start = data.start;
-    contract.end = data.end;
-    contract.firstPayment = data.firstPayment;
+    contract.start = new Date();
+    // contract.end = data.end;
+    contract.tenant = tenant;
 
-    return this.contractRepository
+    return await this.contractRepository
       .save(contract)
-      .then(() => {
-        const msg = `Contract ${contract.contractCode} created as succesfily`;
+      .then(async () => {
+        const msg = `Contract ${contract.id} created as succesfily`;
         console.log(msg);
+
+        await this.createInstallments(contract);
 
         return contract;
       })
       .catch((error) => {
-        console.log(error.driverError.sqlMessage);
+        console.log(error);
 
         throw new HttpException(
           error.driverError.sqlMessage,

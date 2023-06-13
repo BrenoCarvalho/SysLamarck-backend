@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { PropertyService } from './property.service';
@@ -20,13 +21,17 @@ export class PropertyController {
   @UseGuards(JwtAuthGuard)
   @Get()
   async findAll(): Promise<Property[]> {
-    return this.propertyService.findAll();
+    return this.propertyService.findAll({ relations: { locator: true } });
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('findById/:id')
-  async findOne(@Param() params): Promise<Property> {
-    return this.propertyService.findOne(params.id);
+  @Get(':id')
+  async findOne(@Param() params, @Query() query): Promise<Property> {
+    return this.propertyService.findOne(
+      params.id,
+      !!Number(query?.showLocator),
+      !!Number(query?.showTenant),
+    );
   }
 
   @UseGuards(JwtAuthGuard)

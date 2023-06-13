@@ -1,4 +1,13 @@
-import { Entity, Column, CreateDateColumn, PrimaryColumn } from 'typeorm';
+import { Locator } from 'src/locator/locator.entity';
+import { Tenant } from 'src/tenant/tenant.entity';
+import {
+  Entity,
+  Column,
+  CreateDateColumn,
+  PrimaryColumn,
+  ManyToOne,
+  OneToOne,
+} from 'typeorm';
 
 @Entity()
 export class Property {
@@ -8,14 +17,16 @@ export class Property {
   @Column({ length: 100 })
   propertyCode: string;
 
-  @Column('int')
-  locatorCode: number;
+  @ManyToOne(() => Locator, (locator) => locator.property, {
+    onDelete: 'CASCADE',
+  })
+  locator: Locator;
+
+  @OneToOne(() => Tenant, (tenant) => tenant.property)
+  tenant: Tenant;
 
   @Column('int')
   property: number;
-
-  @Column({ length: 100, nullable: true })
-  locatorName: string;
 
   @Column({ length: 100, nullable: true })
   propertyType: string;

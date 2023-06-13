@@ -1,14 +1,25 @@
 import { Bail } from 'src/bail/bail.entity';
 import { Contract } from 'src/contract/contract.entity';
-import { Entity, Column, CreateDateColumn, PrimaryColumn } from 'typeorm';
+import { Property } from 'src/property/property.entity';
+import {
+  Entity,
+  Column,
+  CreateDateColumn,
+  PrimaryColumn,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity()
 export class Tenant {
   @PrimaryColumn('int')
-  tenantCode: number;
+  id: number;
 
-  @Column({ length: 10 })
-  propertyCode: string;
+  @OneToOne(() => Property, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  property: Property;
 
   @Column({ length: 100 })
   fullName: string;
@@ -73,11 +84,11 @@ export class Tenant {
   @Column({ length: 2048 })
   residents: string;
 
-  @Column({ type: 'int', nullable: true })
-  contract: number | Contract;
+  @OneToOne(() => Contract, (contract) => contract.tenant)
+  contract: Contract;
 
-  @Column({ type: 'int', nullable: true })
-  bail: number | Bail;
+  @OneToOne(() => Bail, (bail) => bail.tenant)
+  bail: Bail;
 
   @CreateDateColumn()
   createdAt: Date;

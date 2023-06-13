@@ -6,11 +6,8 @@ export interface ContractCreateDto {
   IPTUPayment?: string;
   index?: string;
   reajust?: string;
-  integralValue?: string;
-  leaseAmount?: string;
-  duration?: string;
-  payday?: string;
-  start?: Date;
-  end?: Date;
-  firstPayment?: Date;
+  integralValue?: number;
+  leaseAmount: number;
+  duration: number;
+  payday: number;
 }

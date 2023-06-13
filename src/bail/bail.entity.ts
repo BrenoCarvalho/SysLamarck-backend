@@ -1,9 +1,23 @@
-import { Entity, Column, CreateDateColumn, PrimaryColumn } from 'typeorm';
+import { Tenant } from 'src/tenant/tenant.entity';
+import {
+  Entity,
+  Column,
+  CreateDateColumn,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity()
 export class Bail {
-  @PrimaryColumn('int')
-  bailCode: number;
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @OneToOne(() => Tenant, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  tenant: Tenant;
 
   @Column({ length: 50, nullable: true })
   type: string;

@@ -8,6 +8,7 @@ import {
 import { Repository } from 'typeorm';
 import { Bail } from './bail.entity';
 import { BailCreateDto } from './dto/bail.create.dto';
+import { Tenant } from 'src/tenant/tenant.entity';
 
 @Injectable()
 export class BailService {
@@ -20,8 +21,8 @@ export class BailService {
     return this.bailRepository.find();
   }
 
-  async delete(bailCode: number): Promise<number> {
-    const response = await this.bailRepository.delete(bailCode);
+  async delete(id: number): Promise<number> {
+    const response = await this.bailRepository.delete(id);
     console.log('bail deleted as successfully');
 
     return response.affected;
@@ -31,23 +32,23 @@ export class BailService {
     return await this.bailRepository.findBy(by);
   }
 
-  async findOne(bailCode: number): Promise<Bail> {
-    return this.bailRepository.findOneBy({ bailCode: bailCode });
+  async findOne(id: number): Promise<Bail> {
+    return this.bailRepository.findOneBy({ id });
   }
 
-  async update(bailCode: number, data: BailCreateDto): Promise<string> {
+  async update(id: number, data: BailCreateDto): Promise<string> {
     const bail = await this.bailRepository.findOneBy({
-      bailCode: bailCode,
+      id,
     });
 
     if (!bail) {
-      throw new NotFoundException(`Bail ${bailCode} not found`);
+      throw new NotFoundException(`Bail ${id} not found`);
     }
 
     return this.bailRepository
-      .update({ bailCode: bailCode }, data)
+      .update({ id }, data)
       .then(() => {
-        const msg = `Bail ${bailCode} updated as successfuly`;
+        const msg = `Bail ${id} updated as successfuly`;
         console.log(msg);
 
         return msg;
@@ -62,38 +63,9 @@ export class BailService {
       });
   }
 
-  async generateBailCode(): Promise<number> {
-    const response = await this.bailRepository.find({
-      select: { bailCode: true },
-    });
-
-    const bailsCode = [];
-
-    response.map((value) => {
-      bailsCode.push(value.bailCode);
-    });
-
-    let code = null;
-    let stop = false;
-
-    if (Math.min(...bailsCode) > 1) {
-      code = 1;
-    } else {
-      bailsCode.map((value, index) => {
-        if (!stop && bailsCode[index + 1] != value + 1) {
-          code = value + 1;
-          stop = true;
-        }
-      });
-    }
-
-    return code;
-  }
-
-  async create(data: BailCreateDto): Promise<Bail> {
+  async create(data: BailCreateDto, tenant: Tenant): Promise<Bail> {
     const bail = new Bail();
 
-    bail.bailCode = await this.generateBailCode();
     bail.type = data.type;
     bail.escrowValue = data.escrowValue;
     bail.warrantyTerm = data?.warrantyTerm;
@@ -152,17 +124,18 @@ export class BailService {
     bail.bailPropertyAddressG2 = data.bailPropertyAddressG2;
     bail.bailPropertyRegistrationNumberG2 =
       data.bailPropertyRegistrationNumberG2;
+    bail.tenant = tenant;
 
     return this.bailRepository
       .save(bail)
       .then(() => {
-        const msg = `Bail ${bail.bailCode} created as succesfily`;
+        const msg = `Bail ${bail.id} created as succesfily`;
         console.log(msg);
 
         return bail;
       })
       .catch((error) => {
-        console.log(error.driverError.sqlMessage);
+        console.log(error);
 
         throw new HttpException(
           error.driverError.sqlMessage,

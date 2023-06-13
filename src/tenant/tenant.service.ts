@@ -25,19 +25,16 @@ export class TenantService {
   ) {}
 
   async findAll(): Promise<Tenant[]> {
-    return this.tenantRepository.find();
+    return this.tenantRepository.find({
+      relations: { contract: true, bail: true, property: true },
+    });
   }
 
-  async findOne(tenantCode: number): Promise<Tenant> {
-    const response = await this.tenantRepository.findOneBy({
-      tenantCode: tenantCode,
+  async findOne(id: number): Promise<Tenant> {
+    const response = await this.tenantRepository.findOne({
+      where: { id },
+      relations: { contract: true, bail: true, property: true },
     });
-
-    response.contract = await this.contractService.findOne(
-      Number(response?.contract),
-    );
-
-    response.bail = await this.bailService.findOne(Number(response?.bail));
 
     response.residents = JSON.parse(response.residents);
 
@@ -48,28 +45,21 @@ export class TenantService {
     return await this.tenantRepository.findBy(by);
   }
 
-  async delete(tenantCode: number): Promise<number> {
-    const tenant = await this.findOne(tenantCode);
-
-    const contract: any = tenant.contract;
-    await this.contractService.delete(contract?.contractCode);
-
-    const bail: any = tenant?.bail;
-    await this.bailService.delete(bail?.bailCode);
-
-    return (await this.tenantRepository.delete(tenantCode)).affected;
+  async delete(id: number): Promise<number> {
+    return (await this.tenantRepository.delete(id)).affected;
   }
 
-  async update(tenantCode: number, data: TenantCreateDto): Promise<string> {
-    const tenant = await this.tenantRepository.findOneBy({
-      tenantCode: tenantCode,
+  async update(id: number, data: TenantCreateDto): Promise<string> {
+    const tenant = await this.tenantRepository.findOne({
+      where: { id },
+      relations: { bail: true, contract: true },
     });
 
     if (!tenant) {
-      throw new NotFoundException(`Tenant ${tenantCode} not found`);
+      throw new NotFoundException(`Tenant ${id} not found`);
     }
 
-    await this.contractService.update(Number(tenant?.contract), {
+    await this.contractService.update(tenant?.contract?.id, {
       applyDiscount: data?.applyDiscount,
       withholdingTax: data?.withholdingTax,
       goal: data?.goal,
@@ -85,7 +75,7 @@ export class TenantService {
       firstPayment: data?.firstPayment,
     });
 
-    await this.bailService.update(Number(tenant?.bail), {
+    await this.bailService.update(tenant?.bail?.id, {
       type: data?.type,
       escrowValue: data?.escrowValue,
       warrantyTerm: data?.warrantyTerm,
@@ -145,8 +135,6 @@ export class TenantService {
     });
 
     const newData = {
-      propertyId: data?.propertyId,
-      propertyCode: data?.propertyCode,
       fullName: data?.fullName,
       birthDate: data?.birthDate,
       rg: data?.rg,
@@ -171,9 +159,9 @@ export class TenantService {
     };
 
     return this.tenantRepository
-      .update({ tenantCode: tenantCode }, newData)
+      .update({ id }, newData)
       .then(() => {
-        const msg = `Tenant ${tenantCode} updated as successfuly`;
+        const msg = `Tenant ${id} updated as successfuly`;
         console.log(msg);
 
         return msg;
@@ -188,16 +176,16 @@ export class TenantService {
       });
   }
 
-  async generateTenantCode(): Promise<number> {
+  async generateTenantId(): Promise<number> {
     const response = await this.tenantRepository.find({
-      select: { tenantCode: true },
+      select: { id: true },
     });
 
     const tenantsCode = [];
 
     if (response?.length) {
       response.map((value) => {
-        tenantsCode.push(value.tenantCode);
+        tenantsCode.push(value.id);
       });
     }
 
@@ -221,8 +209,7 @@ export class TenantService {
   async create(data: TenantCreateDto): Promise<Tenant> {
     const tenant = new Tenant();
 
-    tenant.tenantCode = await this.generateTenantCode();
-    tenant.propertyCode = data?.propertyCode;
+    tenant.id = await this.generateTenantId();
     tenant.fullName = data?.fullName;
     tenant.birthDate = data?.birthDate;
     tenant.rg = data?.rg;
@@ -245,36 +232,34 @@ export class TenantService {
     tenant.contact2T2 = data?.contact2T2;
     tenant.residents = JSON.stringify(data?.residents);
 
-    tenant.contract = (await this.contractService.create(data)).contractCode;
-
-    tenant.bail = (await this.bailService.create(data)).bailCode;
-
-    const property = await this.propertyService.findOneBy({
+    tenant.property = await this.propertyService.findOneBy({
       propertyCode: data?.propertyCode,
-    });
-
-    await this.propertyService.update(property?.id, {
-      locatorCode: property?.locatorCode,
-      vacant: false,
     });
 
     return this.tenantRepository
       .save(tenant)
-      .then(() => {
-        const msg = `Tenant ${tenant.tenantCode} created as succesfily`;
+      .then(async () => {
+        const msg = `Tenant ${tenant.id} created as succesfily`;
         console.log(msg);
+
+        await this.contractService.create(data, tenant);
+        await this.bailService.create(data, tenant);
+
+        await this.propertyService.update(
+          (
+            await this.propertyService.findOneBy({
+              propertyCode: data?.propertyCode,
+            })
+          ).id,
+          {
+            vacant: false,
+          },
+        );
 
         return tenant;
       })
       .catch(async (error) => {
-        console.log(error.driverError.sqlMessage);
-
-        await this.contractService.delete(Number(tenant?.contract));
-        await this.bailService.delete(Number(tenant?.bail));
-        await this.propertyService.update(property?.id, {
-          locatorCode: property?.locatorCode,
-          vacant: true,
-        });
+        console.log(error);
 
         throw new HttpException(
           error.driverError.sqlMessage,

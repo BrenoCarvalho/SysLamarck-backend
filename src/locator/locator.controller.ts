@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { LocatorService } from './locator.service';
@@ -19,14 +20,17 @@ export class LocatorController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async findAll(): Promise<Locator[]> {
-    return this.locatorService.findAll();
+  async findAll(@Query() query): Promise<Locator[]> {
+    return this.locatorService.findAll(!!Number(query?.showProperties));
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async findOne(@Param() params): Promise<Locator> {
-    return this.locatorService.findOne(params.id);
+  async findOne(@Param() params, @Query() query): Promise<Locator> {
+    return this.locatorService.findOne(
+      params.id,
+      !!Number(query?.showProperties),
+    );
   }
 
   @UseGuards(JwtAuthGuard)

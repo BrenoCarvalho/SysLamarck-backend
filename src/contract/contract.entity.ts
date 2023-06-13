@@ -1,11 +1,27 @@
-import { Entity, Column, CreateDateColumn, PrimaryColumn } from 'typeorm';
+import { Rent } from 'src/cashier/rent/rent.entity';
+import { Tenant } from 'src/tenant/tenant.entity';
+import {
+  Entity,
+  Column,
+  CreateDateColumn,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity()
 export class Contract {
-  @PrimaryColumn('int')
-  contractCode: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @Column({ nullable: true })
+  @OneToOne(() => Tenant, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  tenant: Tenant;
+
+  @Column()
   applyDiscount: boolean;
 
   @Column({ nullable: true })
@@ -23,17 +39,17 @@ export class Contract {
   @Column({ length: 50, nullable: true })
   reajust: string;
 
-  @Column({ length: 50, nullable: true })
-  integralValue: string;
+  @Column({ nullable: true })
+  integralValue: number;
 
-  @Column({ length: 50, nullable: true })
-  leaseAmount: string;
+  @Column()
+  leaseAmount: number;
 
-  @Column({ length: 50, nullable: true })
-  duration: string;
+  @Column()
+  duration: number;
 
-  @Column({ length: 50, nullable: true })
-  payday: string;
+  @Column()
+  payday: number;
 
   @Column({ type: 'date', nullable: true })
   start: Date;
@@ -41,8 +57,8 @@ export class Contract {
   @Column({ type: 'date', nullable: true })
   end: Date;
 
-  @Column({ type: 'date', nullable: true })
-  firstPayment: Date;
+  @OneToMany(() => Rent, (rent) => rent.contract)
+  rent: Rent[];
 
   @CreateDateColumn()
   createdAt: Date;

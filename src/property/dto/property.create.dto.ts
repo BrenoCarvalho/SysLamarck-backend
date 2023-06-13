@@ -1,6 +1,6 @@
 export interface PropertyCreateDto {
   propertyCode?: string;
-  locatorCode?: number;
+  locatorId?: number;
   property?: number;
   locatorName?: string;
   propertyType?: string;

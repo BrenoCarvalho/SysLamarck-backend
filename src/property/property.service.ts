@@ -11,7 +11,6 @@ import { Property } from './property.entity';
 import { PropertyCreateDto } from './dto/property.create.dto';
 import { Locator } from 'src/locator/locator.entity';
 import { LocatorService } from 'src/locator/locator.service';
-import { TenantService } from 'src/tenant/tenant.service';
 
 @Injectable()
 export class PropertyService {
@@ -21,8 +20,6 @@ export class PropertyService {
 
     @Inject(forwardRef(() => LocatorService))
     private locatorService: LocatorService,
-
-    private tenantService: TenantService,
   ) {}
 
   async findAll(conditions?: any): Promise<Property[]> {
@@ -40,40 +37,35 @@ export class PropertyService {
   }
 
   async delete(id: number): Promise<number> {
-    const propertyCode = await (
-      await this.propertyRepository.findOneBy({ id })
-    ).propertyCode;
-
-    const tenants = await this.tenantService.findBy({
-      propertyCode: propertyCode,
-    });
-
-    tenants.map(async (value) => {
-      await this.tenantService.delete(value?.tenantCode);
-    });
-
     return (await this.propertyRepository.delete(id)).affected;
   }
 
-  async findOne(id: number): Promise<Property> {
-    return this.propertyRepository.findOneBy({ id: id });
+  async findOne(
+    id: number,
+    showLocator?: boolean,
+    showTenant?: boolean,
+  ): Promise<Property> {
+    return this.propertyRepository.findOne({
+      where: { id: id },
+      relations: { locator: showLocator ?? false, tenant: showTenant ?? false },
+    });
   }
 
   async update(id: number, data: PropertyCreateDto): Promise<string> {
     const property = await this.propertyRepository.findOneBy({ id: id });
+    if (!property) throw new NotFoundException(`Property ${id} not found`);
 
-    if (!property) {
-      throw new NotFoundException(`Property ${id} not found`);
-    }
+    const locator = await this.locatorService.findOne(data.locatorId);
+    if (!locator) throw new NotFoundException(`Locator ${id} not found`);
 
-    data.locatorName = await this.getLocatorName(data.locatorCode);
+    delete data['locatorId'];
 
-    data.propertyCode = `${String(data.locatorCode).padStart(3, '0')}${String(
+    data.propertyCode = `${String(locator?.id).padStart(3, '0')}${String(
       property.property,
     ).padStart(3, '0')}`;
 
     return this.propertyRepository
-      .update({ id: id }, data)
+      .update({ id: id }, { locator, ...data })
       .then(() => {
         const msg = `Property ${id} updated as successfuly`;
         console.log(msg);
@@ -81,10 +73,10 @@ export class PropertyService {
         return msg;
       })
       .catch((error) => {
-        console.log(error.driverError.sqlMessage);
+        console.log(error);
 
         throw new HttpException(
-          error.driverError.sqlMessage,
+          error.driverError?.sqlMessage,
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       });
@@ -118,8 +110,8 @@ export class PropertyService {
     return code;
   }
 
-  async generateProperty(locatorCode: number): Promise<number> {
-    const response = await this.propertyRepository.findBy({ locatorCode });
+  async generateProperty(locator: Locator): Promise<number> {
+    const response = await this.propertyRepository.findBy({ locator });
 
     const properties = [];
 
@@ -127,51 +119,45 @@ export class PropertyService {
       properties.push(value.property);
     });
 
-    return properties.length ? Math.max(...properties) + 1 : 1;
-  }
-
-  async getLocatorName(locatorCode: number): Promise<string> {
-    const locator: Locator = await this.locatorService.findOne(locatorCode);
-    return locator?.fullName;
+    return properties?.length ? Math.max(...properties) + 1 : 1;
   }
 
   async create(data: PropertyCreateDto): Promise<string> {
     const property = new Property();
 
     property.id = await this.generatePropertyId();
-    property.locatorCode = data.locatorCode;
+    property.locator = await this.locatorService.findOne(data?.locatorId);
     property.property = data?.property
       ? data.property
-      : await this.generateProperty(data.locatorCode);
-    property.propertyCode = `${String(data.locatorCode).padStart(
+      : await this.generateProperty(property.locator);
+    property.propertyCode = `${String(data?.locatorId).padStart(
       3,
       '0',
     )}${String(property.property).padStart(3, '0')}`;
-    property.locatorName = await this.getLocatorName(data.locatorCode);
-    property.propertyType = data.propertyType;
-    property.cep = data.cep;
-    property.city = data.city;
-    property.district = data.district;
-    property.address = data.address;
-    property.propertyDescription = data.propertyDescription;
-    property.IPTUPayer = data.IPTUPayer;
-    property.DIMOBDeclaration = data.DIMOBDeclaration;
-    property.goalOfProperty = data.goalOfProperty;
-    property.leaseFee = data.leaseFee;
-    property.administrationTax = data.administrationTax;
-    property.integralValue = data.integralValue;
-    property.leaseAmount = data.leaseAmount;
-    property.sellValue = data.sellValue;
-    property.vacant = data.vacant;
-    property.registrationNumber = data.registrationNumber;
-    property.cityCode = data.cityCode;
-    property.IPTUNumber = data.IPTUNumber;
-    property.IntegralIPTUValue = data.IntegralIPTUValue;
-    property.numberInstallments = data.numberInstallments;
-    property.installmentsIPTUValue = data.installmentsIPTUValue;
-    property.edpInstallation = data.edpInstallation;
-    property.rgi = data.rgi;
-    property.supply = data.supply;
+    property.propertyType = data?.propertyType;
+    property.cep = data?.cep;
+    property.city = data?.city;
+    property.district = data?.district;
+    property.address = data?.address;
+    property.propertyDescription = data?.propertyDescription;
+    property.IPTUPayer = data?.IPTUPayer;
+    property.DIMOBDeclaration = data?.DIMOBDeclaration;
+    property.goalOfProperty = data?.goalOfProperty;
+    property.leaseFee = data?.leaseFee;
+    property.administrationTax = data?.administrationTax;
+    property.integralValue = data?.integralValue;
+    property.leaseAmount = data?.leaseAmount;
+    property.sellValue = data?.sellValue;
+    property.vacant = data?.vacant;
+    property.registrationNumber = data?.registrationNumber;
+    property.cityCode = data?.cityCode;
+    property.IPTUNumber = data?.IPTUNumber;
+    property.IntegralIPTUValue = data?.IntegralIPTUValue;
+    property.numberInstallments = data?.numberInstallments;
+    property.installmentsIPTUValue = data?.installmentsIPTUValue;
+    property.edpInstallation = data?.edpInstallation;
+    property.rgi = data?.rgi;
+    property.supply = data?.supply;
 
     return this.propertyRepository
       .save(property)
