@@ -82,15 +82,12 @@ export class ContractService {
       });
   }
 
-  async createInstallments(contract: Contract) {
-    const currentDate = new Date();
-
+  async generateInstallments(contract: Contract) {
     for (let month = 1; month <= contract.duration; month++) {
-      const dueDate = currentDate;
+      const dueDate = new Date();
 
-      if (month != 1) {
-        dueDate.setMonth(currentDate.getMonth() + month);
-      }
+      dueDate.setDate(contract.payday);
+      dueDate.setMonth(dueDate.getMonth() + month);
 
       await this.rentService.create({
         contract: contract,
@@ -115,8 +112,14 @@ export class ContractService {
     contract.leaseAmount = data.leaseAmount;
     contract.duration = Number(data.duration);
     contract.payday = data.payday;
+
     contract.start = new Date();
-    // contract.end = data.end;
+    contract.start.setDate(contract.payday);
+
+    contract.end = new Date();
+    contract.end.setDate(contract.payday - 1);
+    contract.end.setMonth(contract.start.getMonth() + contract.duration);
+
     contract.tenant = tenant;
 
     return await this.contractRepository
@@ -125,7 +128,7 @@ export class ContractService {
         const msg = `Contract ${contract.id} created as succesfily`;
         console.log(msg);
 
-        await this.createInstallments(contract);
+        await this.generateInstallments(contract);
 
         return contract;
       })

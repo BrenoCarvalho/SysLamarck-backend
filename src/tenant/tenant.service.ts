@@ -70,9 +70,6 @@ export class TenantService {
       leaseAmount: data?.leaseAmount,
       duration: data?.duration,
       payday: data?.payday,
-      start: data?.start,
-      end: data?.end,
-      firstPayment: data?.firstPayment,
     });
 
     await this.bailService.update(tenant?.bail?.id, {

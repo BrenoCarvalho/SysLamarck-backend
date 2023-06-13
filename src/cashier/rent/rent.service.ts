@@ -31,7 +31,7 @@ export class RentService {
     rent.contract = data.contract;
     rent.installmentNumber = data.installmentNumber;
     rent.dueDate = data.dueDate;
-    rent.referenceMonth = monthNames[rent?.dueDate?.getMonth() + 1];
+    rent.referenceMonth = monthNames[rent?.dueDate?.getMonth() - 1];
     rent.amount = data.amount;
     rent.status = data.status;
 
