@@ -1,8 +1,8 @@
 import { Contract } from 'src/contract/contract.entity';
 
-export interface RentCreateDto {
+export interface InstallmentCreateDto {
   contract: Contract;
-  installmentNumber: number;
+  currentInstallment: string;
   dueDate: Date;
   amount: number;
   status: string;

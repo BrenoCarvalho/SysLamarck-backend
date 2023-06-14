@@ -8,15 +8,16 @@ import {
 import { Repository } from 'typeorm';
 import { Contract } from './contract.entity';
 import { ContractCreateDto } from './dto/contract.create.dto';
-import { RentService } from 'src/cashier/rent/rent.service';
 import { Tenant } from 'src/tenant/tenant.entity';
+import { InstallmentService } from './installment/installment.service';
+import { Installment } from './installment/installment.entity';
 
 @Injectable()
 export class ContractService {
   constructor(
     @Inject('CONTRACT_REPOSITORY')
     private contractRepository: Repository<Contract>,
-    private rentService: RentService,
+    private installmentService: InstallmentService,
   ) {}
 
   async findByMonth(
@@ -27,6 +28,10 @@ export class ContractService {
       .createQueryBuilder()
       .where(`MONTH(${type}) = :month`, { month })
       .getMany();
+  }
+
+  async installments(id: number): Promise<Installment[]> {
+    return this.installmentService.findByContractId(id);
   }
 
   async findAll(): Promise<Contract[]> {
@@ -41,18 +46,18 @@ export class ContractService {
     return await this.contractRepository.findBy(by);
   }
 
+  async findOne(id: number): Promise<Contract> {
+    return this.contractRepository.findOne({
+      where: { id },
+      relations: { tenant: true, installment: true },
+    });
+  }
+
   async delete(id: number): Promise<number> {
     const response = await this.contractRepository.delete(id);
     console.log('contract deleted as successfully');
 
-    return response.affected;
-  }
-
-  async findOne(id: number): Promise<Contract> {
-    return this.contractRepository.findOne({
-      where: { id },
-      relations: { tenant: true, rent: true },
-    });
+    return response?.affected;
   }
 
   async update(id: number, data: ContractCreateDto): Promise<string> {
@@ -82,36 +87,20 @@ export class ContractService {
       });
   }
 
-  async generateInstallments(contract: Contract) {
-    for (let month = 1; month <= contract.duration; month++) {
-      const dueDate = new Date();
-
-      dueDate.setDate(contract.payday);
-      dueDate.setMonth(dueDate.getMonth() + month);
-
-      await this.rentService.create({
-        contract: contract,
-        installmentNumber: month,
-        dueDate: dueDate,
-        amount: contract.leaseAmount,
-        status: 'Dv',
-      });
-    }
-  }
-
   async create(data: ContractCreateDto, tenant: Tenant): Promise<Contract> {
     const contract = new Contract();
 
-    contract.applyDiscount = data.applyDiscount;
-    contract.withholdingTax = data.withholdingTax;
-    contract.goal = data.goal;
-    contract.IPTUPayment = data.IPTUPayment;
-    contract.index = data.index;
-    contract.reajust = data.reajust;
-    contract.integralValue = data.integralValue;
-    contract.leaseAmount = data.leaseAmount;
-    contract.duration = Number(data.duration);
-    contract.payday = data.payday;
+    contract.applyDiscount = data?.applyDiscount;
+    contract.withholdingTax = data?.withholdingTax;
+    contract.goal = data?.goal;
+    contract.IPTUPayment = data?.IPTUPayment;
+    contract.index = data?.index;
+    contract.reajust = data?.reajust;
+    contract.integralValue = data?.integralValue;
+    contract.leaseAmount = data?.leaseAmount;
+    contract.duration = Number(data?.duration);
+    contract.payday = Number(data?.payday);
+    contract.gracePeriod = Number(data?.gracePeriod);
 
     contract.start = new Date();
     contract.start.setDate(contract.payday);
@@ -128,7 +117,7 @@ export class ContractService {
         const msg = `Contract ${contract.id} created as succesfily`;
         console.log(msg);
 
-        await this.generateInstallments(contract);
+        await this.installmentService.generateInstallments(contract);
 
         return contract;
       })

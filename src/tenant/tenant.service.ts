@@ -36,7 +36,9 @@ export class TenantService {
       relations: { contract: true, bail: true, property: true },
     });
 
-    response.residents = JSON.parse(response.residents);
+    if (!response) return;
+
+    response.residents = JSON?.parse(response?.residents);
 
     return response;
   }
@@ -70,6 +72,7 @@ export class TenantService {
       leaseAmount: data?.leaseAmount,
       duration: data?.duration,
       payday: data?.payday,
+      gracePeriod: data?.gracePeriod,
     });
 
     await this.bailService.update(tenant?.bail?.id, {

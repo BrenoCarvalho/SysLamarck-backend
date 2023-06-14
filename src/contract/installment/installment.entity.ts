@@ -1,3 +1,4 @@
+import { Transaction } from 'src/transaction/transaction.entity';
 import { Contract } from 'src/contract/contract.entity';
 import {
   Entity,
@@ -7,10 +8,9 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { Transaction } from '../transaction/transaction.entity';
 
 @Entity()
-export class Rent {
+export class Installment {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -19,8 +19,8 @@ export class Rent {
   })
   contract: Contract;
 
-  @Column()
-  installmentNumber: number;
+  @Column({ length: 20 })
+  currentInstallment: string;
 
   @Column('date')
   dueDate: Date;
@@ -34,7 +34,7 @@ export class Rent {
   @Column({ length: 20 })
   status: string;
 
-  @OneToMany(() => Transaction, (transaction) => transaction.rent)
+  @OneToMany(() => Transaction, (transaction) => transaction.installment)
   transaction: Transaction[];
 
   @CreateDateColumn()

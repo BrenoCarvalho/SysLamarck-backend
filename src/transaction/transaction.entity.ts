@@ -1,22 +1,20 @@
+import { Installment } from 'src/contract/installment/installment.entity';
 import {
   Entity,
   CreateDateColumn,
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
-import { Rent } from '../rent/rent.entity';
 
 @Entity()
 export class Transaction {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Rent, (rent) => rent.transaction)
-  rent: Rent;
-
   @Column({ length: 50 })
-  category: 'rent' | 'generic';
+  category: 'rentInstallment' | 'generic';
 
   @Column({ length: 50 })
   type: 'credit' | 'debit';
@@ -32,6 +30,10 @@ export class Transaction {
 
   @Column({ length: 2048 })
   data: string;
+
+  @ManyToOne(() => Installment)
+  @JoinColumn()
+  installment: Installment;
 
   @CreateDateColumn()
   createdAt: Date;

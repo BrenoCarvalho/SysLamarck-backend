@@ -1,5 +1,3 @@
-import { Rent } from 'src/cashier/rent/rent.entity';
-import { Tenant } from 'src/tenant/tenant.entity';
 import {
   Entity,
   Column,
@@ -9,6 +7,8 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
+import { Tenant } from 'src/tenant/tenant.entity';
+import { Installment } from './installment/installment.entity';
 
 @Entity()
 export class Contract {
@@ -21,7 +21,7 @@ export class Contract {
   @JoinColumn()
   tenant: Tenant;
 
-  @Column()
+  @Column({ nullable: true })
   applyDiscount: boolean;
 
   @Column({ nullable: true })
@@ -42,23 +42,26 @@ export class Contract {
   @Column({ nullable: true })
   integralValue: number;
 
-  @Column()
+  @Column('int')
   leaseAmount: number;
 
-  @Column()
+  @Column('int')
   duration: number;
 
-  @Column()
+  @Column('int')
   payday: number;
 
-  @Column({ type: 'date', nullable: true })
+  @Column('int', { nullable: true })
+  gracePeriod: number;
+
+  @Column({ type: 'date' })
   start: Date;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'date' })
   end: Date;
 
-  @OneToMany(() => Rent, (rent) => rent.contract)
-  rent: Rent[];
+  @OneToMany(() => Installment, (installment) => installment.contract)
+  installment: Installment[];
 
   @CreateDateColumn()
   createdAt: Date;
