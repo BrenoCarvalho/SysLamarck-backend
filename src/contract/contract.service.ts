@@ -4,6 +4,7 @@ import {
   HttpException,
   HttpStatus,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Contract } from './contract.entity';
@@ -11,6 +12,7 @@ import { ContractCreateDto } from './dto/contract.create.dto';
 import { Tenant } from 'src/tenant/tenant.entity';
 import { InstallmentService } from './installment/installment.service';
 import { Installment } from './installment/installment.entity';
+import { TransactionService } from 'src/transaction/transaction.service';
 
 @Injectable()
 export class ContractService {
@@ -18,6 +20,9 @@ export class ContractService {
     @Inject('CONTRACT_REPOSITORY')
     private contractRepository: Repository<Contract>,
     private installmentService: InstallmentService,
+
+    @Inject(forwardRef(() => TransactionService))
+    private transactionService: TransactionService,
   ) {}
 
   async findByMonth(
@@ -30,8 +35,8 @@ export class ContractService {
       .getMany();
   }
 
-  async installments(id: number): Promise<Installment[]> {
-    return this.installmentService.findByContractId(id);
+  async installments(contractId: number): Promise<Installment[]> {
+    return this.installmentService.findByContractId(contractId);
   }
 
   async findAll(): Promise<Contract[]> {
@@ -46,10 +51,19 @@ export class ContractService {
     return await this.contractRepository.findBy(by);
   }
 
-  async findOne(id: number): Promise<Contract> {
+  async findOne(
+    id: number,
+    showTenant?: boolean,
+    showAllInstallments?: boolean,
+    showCurrentInstallment?: boolean,
+  ): Promise<Contract> {
     return this.contractRepository.findOne({
       where: { id },
-      relations: { tenant: true, installment: true },
+      relations: {
+        tenant: showTenant ?? false,
+        installment: showAllInstallments ?? false,
+        currentInstallment: showCurrentInstallment ?? false,
+      },
     });
   }
 
@@ -85,6 +99,33 @@ export class ContractService {
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       });
+  }
+
+  async payInstallment(
+    contractId: number,
+    type: 'credit' | 'debit',
+    amount: number,
+    formOfPayment: string,
+    data: string,
+  ): Promise<number> {
+    const contract = await this.contractRepository.findOne({
+      where: { id: contractId },
+      relations: {
+        currentInstallment: true,
+      },
+    });
+
+    await this.transactionService.create({
+      category: 'rentInstallment',
+      type,
+      amount,
+      formOfPayment,
+      data,
+      installment: contract?.currentInstallment,
+    });
+
+    await this.installmentService.pay(contract?.currentInstallment?.id);
+    return await this.updateCurrentInstallment(contract?.id);
   }
 
   async updateCurrentInstallment(contractId: number): Promise<number> {

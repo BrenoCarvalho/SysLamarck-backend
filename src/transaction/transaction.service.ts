@@ -31,7 +31,7 @@ export class TransactionService {
     transaction.amount = data?.amount;
     transaction.formOfPayment = data?.formOfPayment;
     transaction.description = data?.description;
-    transaction.data = data?.data;
+    transaction.data = JSON.stringify(data?.data);
     transaction.installment = data?.installment;
 
     return await this.transactionRepository

@@ -31,7 +31,7 @@ export class Transaction {
   @Column({ length: 2048, nullable: true })
   data: string;
 
-  @ManyToOne(() => Installment)
+  @ManyToOne(() => Installment, { onDelete: 'CASCADE' })
   @JoinColumn()
   installment: Installment;
 

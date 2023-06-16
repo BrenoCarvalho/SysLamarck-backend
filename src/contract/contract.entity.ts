@@ -63,7 +63,7 @@ export class Contract {
   @OneToMany(() => Installment, (installment) => installment.contract)
   installment: Installment[];
 
-  @OneToOne(() => Installment)
+  @OneToOne(() => Installment, { onDelete: 'CASCADE' })
   @JoinColumn()
   currentInstallment: Installment;
 

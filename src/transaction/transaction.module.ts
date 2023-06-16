@@ -8,5 +8,6 @@ import { TransactionController } from './transaction.controller';
   imports: [DatabaseModule],
   controllers: [TransactionController],
   providers: [...transactionProviders, TransactionService],
+  exports: [TransactionService],
 })
 export class TransactionModule {}

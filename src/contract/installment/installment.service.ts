@@ -53,6 +53,12 @@ export class InstallmentService {
     }
   }
 
+  async pay(installmentId: number): Promise<number> {
+    return (
+      await this.installmentRepository.update(installmentId, { status: 'Pg' })
+    ).affected;
+  }
+
   async create(data: InstallmentCreateDto): Promise<Installment> {
     const installment = new Installment();
 
