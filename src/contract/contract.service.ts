@@ -87,6 +87,22 @@ export class ContractService {
       });
   }
 
+  async updateCurrentInstallment(contractId: number): Promise<number> {
+    const installments = await this.installmentService.findByContractId(
+      contractId,
+    );
+
+    const currentInstallment = installments.filter(
+      (installment) => installment.status === 'Dv',
+    )[0];
+
+    return (
+      await this.contractRepository.update(contractId, {
+        currentInstallment,
+      })
+    ).affected;
+  }
+
   async create(data: ContractCreateDto, tenant: Tenant): Promise<Contract> {
     const contract = new Contract();
 
@@ -114,10 +130,11 @@ export class ContractService {
     return await this.contractRepository
       .save(contract)
       .then(async () => {
-        const msg = `Contract ${contract.id} created as succesfily`;
+        const msg = `Contract ${contract?.id} created as succesfily`;
         console.log(msg);
 
         await this.installmentService.generateInstallments(contract);
+        await this.updateCurrentInstallment(contract?.id);
 
         return contract;
       })

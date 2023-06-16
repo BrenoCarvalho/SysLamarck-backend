@@ -63,6 +63,10 @@ export class Contract {
   @OneToMany(() => Installment, (installment) => installment.contract)
   installment: Installment[];
 
+  @OneToOne(() => Installment)
+  @JoinColumn()
+  currentInstallment: Installment;
+
   @CreateDateColumn()
   createdAt: Date;
 }
