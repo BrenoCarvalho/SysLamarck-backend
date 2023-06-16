@@ -22,13 +22,13 @@ export class Transaction {
   @Column('float')
   amount: number;
 
-  @Column({ length: 50 })
+  @Column({ length: 50, nullable: true })
   formOfPayment: string;
 
-  @Column({ length: 100 })
+  @Column({ length: 100, nullable: true })
   description: string;
 
-  @Column({ length: 2048 })
+  @Column({ length: 2048, nullable: true })
   data: string;
 
   @ManyToOne(() => Installment)
