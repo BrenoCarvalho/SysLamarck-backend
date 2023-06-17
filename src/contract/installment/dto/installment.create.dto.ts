@@ -5,5 +5,5 @@ export interface InstallmentCreateDto {
   currentInstallment: string;
   dueDate: Date;
   amount: number;
-  status: string;
+  status: 'Pg' | 'Dv' | 'Ca';
 }

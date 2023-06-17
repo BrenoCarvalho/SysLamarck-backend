@@ -9,14 +9,14 @@ import {
   OneToMany,
 } from 'typeorm';
 
+export type installmentStatusType = 'Pg' | 'Dv' | 'Ca';
+
 @Entity()
 export class Installment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Contract, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Contract, { onDelete: 'CASCADE' })
   contract: Contract;
 
   @Column({ length: 20 })
@@ -31,8 +31,12 @@ export class Installment {
   @Column('float')
   amount: number;
 
-  @Column({ length: 20 })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: ['Pg', 'Dv', 'Ca'],
+    default: 'Dv',
+  })
+  status: installmentStatusType;
 
   @OneToMany(() => Transaction, (transaction) => transaction.installment)
   transaction: Transaction[];

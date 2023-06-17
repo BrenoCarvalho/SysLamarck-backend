@@ -26,6 +26,22 @@ export class InstallmentService {
     private installmentRepository: Repository<Installment>,
   ) {}
 
+  async findOne(id: number): Promise<Installment> {
+    const installment = await this.installmentRepository.findOne({
+      where: { id },
+      relations: { transaction: true },
+    });
+
+    installment?.transaction?.map(
+      (transaction) =>
+        (installment.transaction[
+          installment.transaction.indexOf(transaction)
+        ].data = JSON?.parse(transaction.data)),
+    );
+
+    return installment;
+  }
+
   async findByContractId(id: number): Promise<Installment[]> {
     return await this.installmentRepository.find({
       where: { contract: { id } },

@@ -35,6 +35,10 @@ export class ContractService {
       .getMany();
   }
 
+  async getInstallment(id: number): Promise<Installment> {
+    return await this.installmentService.findOne(id);
+  }
+
   async installments(contractId: number): Promise<Installment[]> {
     return this.installmentService.findByContractId(contractId);
   }

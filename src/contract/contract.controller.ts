@@ -28,6 +28,12 @@ export class ContractController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('installment/:id')
+  async installment(@Param() params: any): Promise<Installment> {
+    return await this.contractService.getInstallment(params.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('installments/:contractId')
   async installments(@Param() params: any): Promise<Installment[]> {
     return await this.contractService.installments(params.contractId);
