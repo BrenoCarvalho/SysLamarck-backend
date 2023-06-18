@@ -55,17 +55,23 @@ export class PropertyService {
     const property = await this.propertyRepository.findOneBy({ id: id });
     if (!property) throw new NotFoundException(`Property ${id} not found`);
 
-    const locator = await this.locatorService.findOne(data.locatorId);
-    if (!locator) throw new NotFoundException(`Locator ${id} not found`);
+    if (data?.locatorId) {
+      const locator = await this.locatorService.findOne(data?.locatorId);
+      if (!locator) throw new NotFoundException(`Locator ${id} not found`);
 
-    delete data['locatorId'];
+      delete data['locatorId'];
+      delete data['propertyCode'];
 
-    data.propertyCode = `${String(locator?.id).padStart(3, '0')}${String(
-      property.property,
-    ).padStart(3, '0')}`;
+      property.locator = locator;
+
+      property.propertyCode = `${String(property?.locator?.id).padStart(
+        3,
+        '0',
+      )}${String(property.property).padStart(3, '0')}`;
+    }
 
     return this.propertyRepository
-      .update({ id: id }, { locator, ...data })
+      .update({ id: id }, { ...property, ...data })
       .then(() => {
         const msg = `Property ${id} updated as successfuly`;
         console.log(msg);

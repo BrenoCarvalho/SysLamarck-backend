@@ -245,16 +245,9 @@ export class TenantService {
         await this.contractService.create(data, tenant);
         await this.bailService.create(data, tenant);
 
-        await this.propertyService.update(
-          (
-            await this.propertyService.findOneBy({
-              propertyCode: data?.propertyCode,
-            })
-          ).id,
-          {
-            vacant: false,
-          },
-        );
+        await this.propertyService.update(tenant?.property?.id, {
+          vacant: false,
+        });
 
         return tenant;
       })

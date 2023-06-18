@@ -32,6 +32,8 @@ export class LocatorService {
   }
 
   async findOne(id: number, showProperties?: boolean): Promise<Locator> {
+    if (!id) throw new NotFoundException(`Invalid id.`);
+
     return this.locatorRepository.findOne({
       where: { id },
       relations: { property: showProperties ?? false },
