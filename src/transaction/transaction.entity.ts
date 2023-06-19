@@ -14,7 +14,7 @@ export class Transaction {
   id: number;
 
   @Column({ length: 50 })
-  category: 'rentInstallment' | 'generic';
+  category: 'rent' | 'generic';
 
   @Column({ length: 50 })
   type: 'credit' | 'debit';

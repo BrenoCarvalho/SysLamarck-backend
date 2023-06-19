@@ -125,7 +125,7 @@ export class ContractService {
     });
 
     await this.transactionService.create({
-      category: 'rentInstallment',
+      category: 'rent',
       type: 'credit',
       amount,
       formOfPayment,
@@ -151,7 +151,7 @@ export class ContractService {
     const installment = await this.installmentService.findOne(installmentId);
 
     return await this.transactionService.create({
-      category: 'rentInstallment',
+      category: 'rent',
       type: 'debit',
       amount,
       data,

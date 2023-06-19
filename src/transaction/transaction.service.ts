@@ -1,5 +1,5 @@
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import { TransactionCreateDto } from './dto/transaction.create.dto';
 
@@ -10,12 +10,29 @@ export class TransactionService {
     private transactionRepository: Repository<Transaction>,
   ) {}
 
-  async findAllByCategory(
-    category: 'generic' | 'rentInstallment',
-  ): Promise<Transaction[]> {
+  async findByCategory({
+    category,
+    start,
+    end,
+    allRelations,
+  }: {
+    category: 'rent' | 'generic';
+    start?: Date | null;
+    end?: Date | null;
+    allRelations?: boolean;
+  }): Promise<Transaction[]> {
+    const where =
+      start && end
+        ? { category, createdAt: Between(start, end) }
+        : { category };
+
+    const relations = allRelations
+      ? ['installment', 'installment.contract.tenant.property.locator']
+      : ['installment'];
+
     return await this.transactionRepository.find({
-      where: { category },
-      relations: { installment: true },
+      where,
+      relations,
     });
   }
 
