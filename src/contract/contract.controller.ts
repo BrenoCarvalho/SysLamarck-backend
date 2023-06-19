@@ -11,6 +11,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ContractService } from './contract.service';
 import { Contract } from './contract.entity';
 import { Installment } from './installment/installment.entity';
+import { Transaction } from 'src/transaction/transaction.entity';
 
 @Controller('contract')
 export class ContractController {
@@ -53,14 +54,29 @@ export class ContractController {
     @Param() param: any,
     @Body() body: any,
   ): Promise<number> {
-    const { type, amount, formOfPayment, data } = body;
+    const { amount, data, formOfPayment } = body;
 
-    return await this.contractService.payInstallment(
-      param?.contractId,
-      type,
+    return await this.contractService.payInstallment({
+      contractId: param?.contractId,
       amount,
-      formOfPayment,
       data,
-    );
+      formOfPayment,
+    });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('transferRent/:installmentId')
+  async transferRent(
+    @Param() param: any,
+    @Body() body: any,
+  ): Promise<Transaction> {
+    const { amount, data, formOfPayment } = body;
+
+    return await this.contractService.transferRent({
+      installmentId: param?.installmentId,
+      amount,
+      data,
+      formOfPayment,
+    });
   }
 }

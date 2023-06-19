@@ -13,6 +13,7 @@ import { Tenant } from 'src/tenant/tenant.entity';
 import { InstallmentService } from './installment/installment.service';
 import { Installment } from './installment/installment.entity';
 import { TransactionService } from 'src/transaction/transaction.service';
+import { Transaction } from 'src/transaction/transaction.entity';
 
 @Injectable()
 export class ContractService {
@@ -105,13 +106,17 @@ export class ContractService {
       });
   }
 
-  async payInstallment(
-    contractId: number,
-    type: 'credit' | 'debit',
-    amount: number,
-    formOfPayment: string,
-    data: string,
-  ): Promise<number> {
+  async payInstallment({
+    contractId,
+    amount,
+    formOfPayment,
+    data,
+  }: {
+    contractId: number;
+    amount: number;
+    formOfPayment: string;
+    data: string;
+  }): Promise<number> {
     const contract = await this.contractRepository.findOne({
       where: { id: contractId },
       relations: {
@@ -121,7 +126,7 @@ export class ContractService {
 
     await this.transactionService.create({
       category: 'rentInstallment',
-      type,
+      type: 'credit',
       amount,
       formOfPayment,
       data,
@@ -130,6 +135,29 @@ export class ContractService {
 
     await this.installmentService.pay(contract?.currentInstallment?.id);
     return await this.updateCurrentInstallment(contract?.id);
+  }
+
+  async transferRent({
+    installmentId,
+    amount,
+    data,
+    formOfPayment,
+  }: {
+    installmentId: number;
+    amount: number;
+    data: string;
+    formOfPayment: string;
+  }): Promise<Transaction> {
+    const installment = await this.installmentService.findOne(installmentId);
+
+    return await this.transactionService.create({
+      category: 'rentInstallment',
+      type: 'debit',
+      amount,
+      data,
+      formOfPayment,
+      installment: installment,
+    });
   }
 
   async updateCurrentInstallment(contractId: number): Promise<number> {

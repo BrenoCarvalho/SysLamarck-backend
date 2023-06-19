@@ -1,4 +1,10 @@
-import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  HttpException,
+  HttpStatus,
+  NotFoundException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Installment } from './installment.entity';
 import { InstallmentCreateDto } from './dto/installment.create.dto';
@@ -27,6 +33,8 @@ export class InstallmentService {
   ) {}
 
   async findOne(id: number): Promise<Installment> {
+    if (!id) throw new NotFoundException(`Invalid id.`);
+
     const installment = await this.installmentRepository.findOne({
       where: { id },
       relations: { transaction: true },
