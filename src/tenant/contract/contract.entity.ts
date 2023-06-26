@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Tenant } from 'src/tenant/tenant.entity';
 import { Installment } from './installment/installment.entity';
+import { Bail } from './bail/bail.entity';
 
 @Entity()
 export class Contract {
@@ -17,6 +18,7 @@ export class Contract {
 
   @OneToOne(() => Tenant, {
     onDelete: 'CASCADE',
+    nullable: false,
   })
   @JoinColumn()
   tenant: Tenant;
@@ -59,6 +61,9 @@ export class Contract {
 
   @Column({ type: 'date' })
   end: Date;
+
+  @OneToOne(() => Bail, (bail: Bail) => bail.contract)
+  bail: Bail;
 
   @OneToMany(() => Installment, (installment) => installment.contract)
   installment: Installment[];

@@ -1,4 +1,6 @@
-export interface ContractCreateDto {
+import { BailCreateDto } from '../bail/dto/bail.create.dto';
+
+export interface ContractCreateDto extends BailCreateDto {
   applyDiscount?: boolean;
   withholdingTax?: boolean;
   goal: string;

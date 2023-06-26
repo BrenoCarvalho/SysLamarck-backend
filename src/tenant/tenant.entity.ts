@@ -1,5 +1,3 @@
-import { Bail } from 'src/bail/bail.entity';
-import { Contract } from 'src/contract/contract.entity';
 import { Property } from 'src/property/property.entity';
 import {
   Entity,
@@ -9,6 +7,7 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
+import { Contract } from './contract/contract.entity';
 
 @Entity()
 export class Tenant {
@@ -84,11 +83,8 @@ export class Tenant {
   @Column({ length: 2048 })
   residents: string;
 
-  @OneToOne(() => Contract, (contract) => contract.tenant)
+  @OneToOne(() => Contract, (contract: Contract) => contract.tenant)
   contract: Contract;
-
-  @OneToOne(() => Bail, (bail) => bail.tenant)
-  bail: Bail;
 
   @CreateDateColumn()
   createdAt: Date;

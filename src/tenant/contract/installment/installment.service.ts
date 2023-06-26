@@ -4,11 +4,15 @@ import {
   HttpException,
   HttpStatus,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Installment } from './installment.entity';
 import { InstallmentCreateDto } from './dto/installment.create.dto';
 import { Contract } from '../contract.entity';
+import { ContractService } from '../contract.service';
+import { TransactionService } from 'src/cashier/transaction/transaction.service';
+import { Transaction } from 'src/cashier/transaction/transaction.entity';
 
 const monthNames = [
   'Janeiro',
@@ -30,6 +34,9 @@ export class InstallmentService {
   constructor(
     @Inject('INSTALLMENT_REPOSITORY')
     private installmentRepository: Repository<Installment>,
+    @Inject(forwardRef(() => ContractService))
+    private contractService: ContractService,
+    private transactionService: TransactionService,
   ) {}
 
   async findOne(id: number): Promise<Installment> {
@@ -50,9 +57,11 @@ export class InstallmentService {
     return installment;
   }
 
-  async findByContractId(id: number): Promise<Installment[]> {
+  async findByTenantId(tenantId: number): Promise<Installment[]> {
+    if (!tenantId) return;
+
     return await this.installmentRepository.find({
-      where: { contract: { id } },
+      where: { contract: { tenant: { id: tenantId } } },
       loadRelationIds: true,
       relations: {
         transaction: true,
@@ -77,26 +86,71 @@ export class InstallmentService {
     }
   }
 
-  async pay(installmentId: number): Promise<number> {
-    return (
-      await this.installmentRepository.update(installmentId, { status: 'Pg' })
-    ).affected;
+  async pay({
+    tenantId,
+    amount,
+    formOfPayment,
+    data,
+  }: {
+    tenantId: number;
+    amount: number;
+    formOfPayment: string;
+    data: string;
+  }): Promise<number> {
+    const contract = await this.contractService.findOneByTenantId({
+      tenantId,
+      showCurrentInstallment: true,
+    });
+
+    await this.transactionService.create({
+      category: 'rent',
+      type: 'credit',
+      amount,
+      formOfPayment,
+      data,
+      installment: contract?.currentInstallment,
+    });
+
+    await this.installmentRepository.update(contract?.currentInstallment?.id, {
+      status: 'Pg',
+    });
+
+    return await this.contractService.updateCurrentInstallment(tenantId);
+  }
+
+  async transfer({
+    installmentId,
+    amount,
+    formOfPayment,
+    data,
+  }: {
+    installmentId: number;
+    amount: number;
+    formOfPayment: string;
+    data: string;
+  }): Promise<Transaction> {
+    const installment = await this.findOne(installmentId);
+
+    return await this.transactionService.create({
+      category: 'rent',
+      type: 'debit',
+      amount,
+      data,
+      formOfPayment,
+      installment,
+    });
   }
 
   async create(data: InstallmentCreateDto): Promise<Installment> {
-    const installment = new Installment();
-
     const referenceMonthIndex =
       data?.dueDate?.getMonth() == 0
         ? monthNames?.length - 1
         : data?.dueDate?.getMonth() - 1;
 
-    installment.contract = data?.contract;
-    installment.currentInstallment = data?.currentInstallment;
-    installment.dueDate = data?.dueDate;
-    installment.referenceMonth = monthNames[referenceMonthIndex];
-    installment.amount = data?.amount;
-    installment.status = data?.status;
+    const installment = this.installmentRepository.create({
+      ...data,
+      referenceMonth: monthNames[referenceMonthIndex],
+    });
 
     return await this.installmentRepository
       .save(installment)

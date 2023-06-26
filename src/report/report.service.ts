@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Contract } from 'src/contract/contract.entity';
-import { ContractService } from 'src/contract/contract.service';
 import { LocatorService } from 'src/locator/locator.service';
 import { PropertyService } from 'src/property/property.service';
+import { ContractService } from 'src/tenant/contract/contract.service';
 import { TenantService } from 'src/tenant/tenant.service';
 import { Between } from 'typeorm';
 

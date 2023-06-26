@@ -1,4 +1,4 @@
-import { Installment } from 'src/contract/installment/installment.entity';
+import { Installment } from 'src/tenant/contract/installment/installment.entity';
 
 export interface TransactionCreateDto {
   category: 'rent' | 'generic';

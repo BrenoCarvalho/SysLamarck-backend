@@ -1,5 +1,4 @@
-import { BailCreateDto } from 'src/bail/dto/bail.create.dto';
-import { ContractCreateDto } from 'src/contract/dto/contract.create.dto';
+import { ContractCreateDto } from '../contract/dto/contract.create.dto';
 
 export interface Resident {
   fullName: string;
@@ -8,7 +7,7 @@ export interface Resident {
   contact1: string;
 }
 
-export interface TenantCreateDto extends ContractCreateDto, BailCreateDto {
+export interface TenantCreateDto extends ContractCreateDto {
   propertyCode: string;
   fullName: string;
   birthDate: Date;

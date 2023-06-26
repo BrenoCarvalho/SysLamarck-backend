@@ -1,4 +1,5 @@
-import { Installment } from 'src/contract/installment/installment.entity';
+import { Cashier } from 'src/cashier/cashier.entity';
+import { Installment } from 'src/tenant/contract/installment/installment.entity';
 import {
   Entity,
   CreateDateColumn,
@@ -13,10 +14,10 @@ export class Transaction {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 50 })
+  @Column({ type: 'enum', enum: ['rent', 'generic'] })
   category: 'rent' | 'generic';
 
-  @Column({ length: 50 })
+  @Column({ type: 'enum', enum: ['credit', 'debit'] })
   type: 'credit' | 'debit';
 
   @Column('float')
@@ -34,6 +35,10 @@ export class Transaction {
   @ManyToOne(() => Installment, { onDelete: 'SET NULL' })
   @JoinColumn()
   installment: Installment;
+
+  @ManyToOne(() => Cashier, { onDelete: 'CASCADE', nullable: false })
+  @JoinColumn()
+  cashier: Cashier;
 
   @CreateDateColumn()
   createdAt: Date;

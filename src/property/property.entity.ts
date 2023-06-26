@@ -14,7 +14,7 @@ export class Property {
   @PrimaryColumn('int')
   id: number;
 
-  @Column({ length: 100 })
+  @Column({ length: 100, unique: true })
   propertyCode: string;
 
   @ManyToOne(() => Locator, (locator) => locator.property, {

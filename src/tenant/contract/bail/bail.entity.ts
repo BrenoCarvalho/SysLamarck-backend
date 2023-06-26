@@ -1,4 +1,3 @@
-import { Tenant } from 'src/tenant/tenant.entity';
 import {
   Entity,
   Column,
@@ -7,17 +6,19 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
+import { Contract } from '../contract.entity';
 
 @Entity()
 export class Bail {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => Tenant, {
+  @OneToOne(() => Contract, {
     onDelete: 'CASCADE',
+    nullable: false,
   })
   @JoinColumn()
-  tenant: Tenant;
+  contract: Contract;
 
   @Column({ length: 50, nullable: true })
   type: string;

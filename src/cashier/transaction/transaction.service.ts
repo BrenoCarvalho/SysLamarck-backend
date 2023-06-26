@@ -1,55 +1,53 @@
-import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  HttpException,
+  HttpStatus,
+  NotFoundException,
+} from '@nestjs/common';
 import { Between, Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import { TransactionCreateDto } from './dto/transaction.create.dto';
+import { CashierService } from '../cashier.service';
 
 @Injectable()
 export class TransactionService {
   constructor(
     @Inject('TRANSACTION_REPOSITORY')
     private transactionRepository: Repository<Transaction>,
+    private cashierService: CashierService,
   ) {}
 
   async findByCategory({
     category,
-    start,
-    end,
+    cashierId,
     allRelations,
   }: {
     category: 'rent' | 'generic';
-    start?: Date | null;
-    end?: Date | null;
+    cashierId: number;
     allRelations?: boolean;
   }): Promise<Transaction[]> {
-    const where =
-      start && end
-        ? { category, createdAt: Between(start, end) }
-        : { category };
+    if (!cashierId) return [];
 
     const relations = allRelations
       ? ['installment', 'installment.contract.tenant.property.locator']
       : ['installment'];
 
     return await this.transactionRepository.find({
-      where,
+      where: { category, cashier: { id: cashierId } },
       relations,
     });
   }
 
-  async delete(id: number): Promise<number> {
-    return (await this.transactionRepository.delete(id)).affected;
-  }
-
   async create(data: TransactionCreateDto): Promise<Transaction> {
-    const transaction = new Transaction();
+    const cashier = await this.cashierService.openedCashier();
+    if (!cashier) throw new NotFoundException(`No cashier open`);
 
-    transaction.category = data?.category;
-    transaction.type = data?.type;
-    transaction.amount = data?.amount;
-    transaction.formOfPayment = data?.formOfPayment;
-    transaction.description = data?.description;
-    transaction.data = JSON.stringify(data?.data);
-    transaction.installment = data?.installment;
+    const transaction = this.transactionRepository.create({
+      ...data,
+      data: JSON.stringify(data?.data),
+      cashier,
+    });
 
     return await this.transactionRepository
       .save(transaction)

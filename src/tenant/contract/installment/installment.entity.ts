@@ -1,5 +1,4 @@
-import { Transaction } from 'src/transaction/transaction.entity';
-import { Contract } from 'src/contract/contract.entity';
+import { Transaction } from 'src/cashier/transaction/transaction.entity';
 import {
   Entity,
   Column,
@@ -8,15 +7,14 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-
-export type installmentStatusType = 'Pg' | 'Dv' | 'Ca';
+import { Contract } from '../contract.entity';
 
 @Entity()
 export class Installment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Contract, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Contract, { onDelete: 'CASCADE', nullable: false })
   contract: Contract;
 
   @Column({ length: 20 })
@@ -36,7 +34,7 @@ export class Installment {
     enum: ['Pg', 'Dv', 'Ca'],
     default: 'Dv',
   })
-  status: installmentStatusType;
+  status: 'Pg' | 'Dv' | 'Ca';
 
   @OneToMany(() => Transaction, (transaction) => transaction.installment)
   transaction: Transaction[];

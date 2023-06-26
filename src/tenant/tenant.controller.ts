@@ -32,7 +32,7 @@ export class TenantController {
   @UseGuards(JwtAuthGuard)
   @Put(':tenantCode')
   async update(
-    @Param() params,
+    @Param() params: any,
     @Body() data: TenantCreateDto,
   ): Promise<string> {
     return this.tenantService.update(params.tenantCode, data);
@@ -46,7 +46,7 @@ export class TenantController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':tenantCode')
-  async delete(@Param() params): Promise<number> {
+  async delete(@Param() params: any): Promise<number> {
     return await this.tenantService.delete(params.tenantCode);
   }
 }

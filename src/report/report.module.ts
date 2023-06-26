@@ -4,7 +4,7 @@ import { ReportService } from './report.service';
 import { PropertyModule } from 'src/property/property.module';
 import { TenantModule } from 'src/tenant/tenant.module';
 import { LocatorModule } from 'src/locator/locator.module';
-import { ContractModule } from 'src/contract/contract.module';
+import { ContractModule } from 'src/tenant/contract/contract.module';
 
 @Module({
   imports: [PropertyModule, TenantModule, LocatorModule, ContractModule],

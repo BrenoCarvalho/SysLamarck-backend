@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../database/database.module';
 import { propertyProviders } from './property.providers';
 import { PropertyService } from './property.service';
@@ -7,7 +7,7 @@ import { LocatorModule } from 'src/locator/locator.module';
 import { TenantModule } from 'src/tenant/tenant.module';
 
 @Module({
-  imports: [DatabaseModule, forwardRef(() => LocatorModule), TenantModule],
+  imports: [DatabaseModule, LocatorModule, TenantModule],
   controllers: [PropertyController],
   providers: [...propertyProviders, PropertyService],
   exports: [PropertyService],

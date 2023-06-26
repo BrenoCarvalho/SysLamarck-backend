@@ -4,12 +4,10 @@ import {
   HttpException,
   HttpStatus,
   NotFoundException,
-  forwardRef,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Property } from './property.entity';
 import { PropertyCreateDto } from './dto/property.create.dto';
-import { Locator } from 'src/locator/locator.entity';
 import { LocatorService } from 'src/locator/locator.service';
 
 @Injectable()
@@ -17,8 +15,6 @@ export class PropertyService {
   constructor(
     @Inject('PROPERTY_REPOSITORY')
     private propertyRepository: Repository<Property>,
-
-    @Inject(forwardRef(() => LocatorService))
     private locatorService: LocatorService,
   ) {}
 
@@ -116,8 +112,10 @@ export class PropertyService {
     return code;
   }
 
-  async generateProperty(locator: Locator): Promise<number> {
-    const response = await this.propertyRepository.findBy({ locator });
+  async generateProperty(locatorId: number): Promise<number> {
+    const response = await this.propertyRepository.findBy({
+      locator: { id: locatorId },
+    });
 
     const properties = [];
 
@@ -129,41 +127,25 @@ export class PropertyService {
   }
 
   async create(data: PropertyCreateDto): Promise<string> {
-    const property = new Property();
+    const locator = await this.locatorService.findOne(data?.locatorId);
+    if (!locator)
+      throw new NotFoundException(`Locator ${data?.locatorId} not found`);
 
-    property.id = await this.generatePropertyId();
-    property.locator = await this.locatorService.findOne(data?.locatorId);
-    property.property = data?.property
+    const propertyNumber = data?.property
       ? data.property
-      : await this.generateProperty(property.locator);
-    property.propertyCode = `${String(data?.locatorId).padStart(
-      3,
-      '0',
-    )}${String(property.property).padStart(3, '0')}`;
-    property.propertyType = data?.propertyType;
-    property.cep = data?.cep;
-    property.city = data?.city;
-    property.district = data?.district;
-    property.address = data?.address;
-    property.propertyDescription = data?.propertyDescription;
-    property.IPTUPayer = data?.IPTUPayer;
-    property.DIMOBDeclaration = data?.DIMOBDeclaration;
-    property.goalOfProperty = data?.goalOfProperty;
-    property.leaseFee = data?.leaseFee;
-    property.administrationTax = data?.administrationTax;
-    property.integralValue = data?.integralValue;
-    property.leaseAmount = data?.leaseAmount;
-    property.sellValue = data?.sellValue;
-    property.vacant = data?.vacant;
-    property.registrationNumber = data?.registrationNumber;
-    property.cityCode = data?.cityCode;
-    property.IPTUNumber = data?.IPTUNumber;
-    property.IntegralIPTUValue = data?.IntegralIPTUValue;
-    property.numberInstallments = data?.numberInstallments;
-    property.installmentsIPTUValue = data?.installmentsIPTUValue;
-    property.edpInstallation = data?.edpInstallation;
-    property.rgi = data?.rgi;
-    property.supply = data?.supply;
+      : await this.generateProperty(locator?.id);
+
+    const propertyCode = `${String(data?.locatorId).padStart(3, '0')}${String(
+      propertyNumber,
+    ).padStart(3, '0')}`;
+
+    const property = this.propertyRepository.create({
+      ...data,
+      id: await this.generatePropertyId(),
+      locator,
+      property: propertyNumber,
+      propertyCode,
+    });
 
     return this.propertyRepository
       .save(property)

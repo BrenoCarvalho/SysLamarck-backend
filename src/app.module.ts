@@ -8,7 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { PropertyModule } from './property/property.module';
 import { TenantModule } from './tenant/tenant.module';
 import { ReportModule } from './report/report.module';
-import { TransactionModule } from './transaction/transaction.module';
+import { CashierModule } from './cashier/cashier.module';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { TransactionModule } from './transaction/transaction.module';
     ConfigModule.forRoot(),
     AuthModule,
     ReportModule,
-    TransactionModule,
+    CashierModule,
   ],
   controllers: [AppController],
   providers: [AppService],

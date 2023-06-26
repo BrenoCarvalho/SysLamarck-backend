@@ -1,4 +1,4 @@
-import { Contract } from 'src/contract/contract.entity';
+import { Contract } from '../../contract.entity';
 
 export interface InstallmentCreateDto {
   contract: Contract;

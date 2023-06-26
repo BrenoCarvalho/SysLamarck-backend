@@ -4,21 +4,16 @@ import {
   HttpException,
   HttpStatus,
   NotFoundException,
-  forwardRef,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Locator } from './locator.entity';
 import { LocatorCreateDto } from './dto/locator.create.dto';
-import { PropertyService } from 'src/property/property.service';
 
 @Injectable()
 export class LocatorService {
   constructor(
     @Inject('LOCATOR_REPOSITORY')
     private locatorRepository: Repository<Locator>,
-
-    @Inject(forwardRef(() => PropertyService))
-    private propertyService: PropertyService,
   ) {}
 
   async findAll(showProperties?: boolean): Promise<Locator[]> {
@@ -92,34 +87,15 @@ export class LocatorService {
   }
 
   async create(data: LocatorCreateDto): Promise<string> {
-    const locator = new Locator();
-
-    locator.id = data?.id ?? (await this.generateLocatorCode());
-    locator.provisionService = data?.provisionService;
-    locator.fullName = data?.fullName;
-    locator.birthDate = data?.birthDate;
-    locator.rg = data?.rg;
-    locator.cpf = data?.cpf;
-    locator.nationality = data?.nationality;
-    locator.maritalStatus = data?.maritalStatus;
-    locator.profession = data?.profession;
-    locator.email = data?.email;
-    locator.contact1 = data?.contact1;
-    locator.contact2 = data?.contact2;
-    locator.cep = data?.cep;
-    locator.city = data?.city;
-    locator.district = data?.district;
-    locator.address = data?.address;
-    locator.bank = data?.bank;
-    locator.accountType = data?.accountType;
-    locator.agency = data?.agency;
-    locator.accountNumber = data?.accountNumber;
-    locator.paymentRemittance = data?.paymentRemittance;
+    const locator = this.locatorRepository.create({
+      ...data,
+      id: data?.id ?? (await this.generateLocatorCode()),
+    });
 
     return await this.locatorRepository
       .save(locator)
       .then(() => {
-        const msg = `Locator ${locator.id} created as succesfily`;
+        const msg = `Locator ${locator?.id} created as succesfily`;
         console.log(msg);
 
         return msg;
