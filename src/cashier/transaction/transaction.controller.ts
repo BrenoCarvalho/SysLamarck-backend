@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Transaction } from './transaction.entity';
 import { TransactionCreateDto } from './dto/transaction.create.dto';
@@ -35,5 +44,11 @@ export class TransactionController {
   @Post()
   async create(@Body() data: TransactionCreateDto): Promise<Transaction> {
     return await this.transactionService.create(data);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async delete(@Param() params: any): Promise<number> {
+    return await this.transactionService.delete(params?.id);
   }
 }

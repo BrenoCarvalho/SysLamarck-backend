@@ -39,6 +39,10 @@ export class TransactionService {
     });
   }
 
+  async delete(id: number): Promise<number> {
+    return (await this.transactionRepository.delete(id)).affected;
+  }
+
   async create(data: TransactionCreateDto): Promise<Transaction> {
     const cashier = await this.cashierService.openedCashier();
     if (!cashier) throw new NotFoundException(`No cashier open`);
