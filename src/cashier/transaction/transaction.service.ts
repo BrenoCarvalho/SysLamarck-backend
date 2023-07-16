@@ -5,7 +5,7 @@ import {
   HttpStatus,
   NotFoundException,
 } from '@nestjs/common';
-import { Between, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import { TransactionCreateDto } from './dto/transaction.create.dto';
 import { CashierService } from '../cashier.service';
