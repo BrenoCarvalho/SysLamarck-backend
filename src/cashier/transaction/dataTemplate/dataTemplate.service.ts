@@ -47,11 +47,12 @@ export class DataTemplateService {
     tenantId = Number(tenantId) ?? null;
     if (!tenantId) throw new NotFoundException(`No tenant Id found.`);
 
-    const dataTemplate = await this.dataTemplateRepository.findOne({
-      where: { tenant: { id: tenantId }, type },
-    });
+    const dataTemplate =
+      (await this.dataTemplateRepository.findOne({
+        where: { tenant: { id: tenantId }, type },
+      })) ?? null;
 
-    dataTemplate.data = JSON.parse(dataTemplate?.data);
+    if (dataTemplate) dataTemplate.data = JSON.parse(dataTemplate?.data);
 
     return dataTemplate;
   }
