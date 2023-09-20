@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ReportController } from './report.controller';
 import { ReportService } from './report.service';
 import { PropertyModule } from 'src/property/property.module';
@@ -7,8 +7,9 @@ import { LocatorModule } from 'src/locator/locator.module';
 import { ContractModule } from 'src/tenant/contract/contract.module';
 
 @Module({
-  imports: [PropertyModule, TenantModule, LocatorModule, ContractModule],
+  imports: [],
   controllers: [ReportController],
   providers: [ReportService],
+  exports: [ReportService],
 })
 export class ReportModule {}

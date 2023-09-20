@@ -90,18 +90,19 @@ export class ContractService {
   async updateCurrentInstallment(tenantId: number): Promise<number> {
     const installments = await this.installmentService.findByTenantId(tenantId);
 
-    const currentInstallment = installments.filter(
+    const unpaidInstallments = installments.filter(
       (installment) => installment.status === 'Dv',
-    )[0];
+    );
 
-    return (
-      await this.contractRepository.update(
-        { tenant: { id: tenantId } },
-        {
-          currentInstallment,
-        },
-      )
-    ).affected;
+    if (unpaidInstallments?.length > 0)
+      return (
+        await this.contractRepository.update(
+          { tenant: { id: tenantId } },
+          {
+            currentInstallment: unpaidInstallments[0],
+          },
+        )
+      ).affected;
   }
 
   async create(data: ContractCreateDto, tenant: Tenant): Promise<Contract> {

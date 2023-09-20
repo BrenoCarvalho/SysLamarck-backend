@@ -5,6 +5,7 @@ import {
   HttpStatus,
   NotFoundException,
   forwardRef,
+  BadRequestException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Installment } from './installment.entity';
@@ -13,6 +14,14 @@ import { Contract } from '../contract.entity';
 import { ContractService } from '../contract.service';
 import { TransactionService } from 'src/cashier/transaction/transaction.service';
 import { Transaction } from 'src/cashier/transaction/transaction.entity';
+import { ReportService } from 'src/report/report.service';
+import { create as buildHtml } from 'puppeteer-html-pdf';
+import RentReceipt from 'src/templates/rentReceipt';
+import {
+  currencyFormatter,
+  dateFormatter,
+  propertyCodeFormatter,
+} from 'src/templates/formatters';
 
 const monthNames = [
   'Janeiro',
@@ -37,6 +46,7 @@ export class InstallmentService {
     @Inject(forwardRef(() => ContractService))
     private contractService: ContractService,
     private transactionService: TransactionService,
+    private readonly reportService: ReportService,
   ) {}
 
   async findOne(id: number): Promise<Installment> {
@@ -86,6 +96,83 @@ export class InstallmentService {
     }
   }
 
+  async receipt({
+    installmentId,
+    mode,
+  }: {
+    installmentId: number;
+    mode: 'tenant' | 'locator';
+  }): Promise<any> {
+    const installment = await this.installmentRepository.findOne({
+      where: {
+        id: installmentId,
+      },
+      relations: [
+        'transaction',
+        'contract',
+        'contract.tenant',
+        'contract.tenant.property',
+        'contract.tenant.property.locator',
+      ],
+    });
+
+    const dueDate = dateFormatter({
+      value: installment.dueDate,
+    });
+
+    const referentialMonth = `${
+      monthNames.indexOf(installment.referenceMonth) + 1
+    }/${dueDate.slice(6)}`;
+
+    const paymentDate = new Date(
+      installment.transaction[0].createdAt,
+    ).toLocaleDateString('pt-BR', {
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric',
+    });
+
+    const transactionData = JSON.parse(installment.transaction[0].data);
+
+    const buffer = buildHtml(
+      RentReceipt({
+        tenantFullName: installment.contract.tenant.fullName,
+        propertyAddress: installment.contract.tenant.property.address,
+        locatorFullName: installment.contract.tenant.property.locator.fullName,
+        propertyCode: propertyCodeFormatter({
+          value: installment.contract.tenant.property.propertyCode,
+        }),
+        referentialMonth,
+        dueDateMonth: dueDate.slice(3),
+        dueDate,
+        paymentDate: paymentDate,
+        currentInstallment: installment.currentInstallment,
+        installmentTransactionAmount: currencyFormatter({
+          value: installment.transaction[0].amount,
+        }),
+        rent: currencyFormatter({ value: transactionData['rent'] }),
+        iptu: currencyFormatter({ value: transactionData['iptu'] }),
+        water: currencyFormatter({ value: transactionData['water'] }),
+        eletricity: currencyFormatter({ value: transactionData['eletricity'] }),
+        condominium: currencyFormatter({
+          value: transactionData['condominium'],
+        }),
+        incomeTax: currencyFormatter({ value: transactionData['incomeTax'] }),
+        specialDiscount: currencyFormatter({
+          value: transactionData['specialDiscount'],
+        }),
+        breachOfContractFine: currencyFormatter({
+          value: transactionData['breachOfContractFine'],
+        }),
+      }),
+      {
+        format: 'A4',
+      },
+    );
+
+    return buffer;
+  }
+
   async pay({
     tenantId,
     amount,
@@ -102,6 +189,10 @@ export class InstallmentService {
       showCurrentInstallment: true,
     });
 
+    if (contract.currentInstallment.status != 'Dv') {
+      throw new BadRequestException('Installment already paid');
+    }
+
     await this.transactionService.create({
       category: 'rent',
       type: 'credit',
@@ -115,7 +206,9 @@ export class InstallmentService {
       status: 'Pg',
     });
 
-    return await this.contractService.updateCurrentInstallment(tenantId);
+    await this.contractService.updateCurrentInstallment(tenantId);
+
+    return contract?.currentInstallment?.id;
   }
 
   async transfer({

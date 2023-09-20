@@ -1,19 +1,28 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
-import { Property } from 'src/property/property.entity';
+import { Controller, Get, Res, UseGuards } from '@nestjs/common';
 import { ReportService } from './report.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('report')
 export class ReportController {
   constructor(private readonly reportService: ReportService) {}
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/downloadPdfTest')
+  async downloadPdfTest(@Res() res): Promise<any> {
+    const buffer = await this.reportService.downloadPdfTest();
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename=pdf.pdf`,
+      'Content-Length': buffer?.length,
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: 0,
+    });
+
+    res.end(buffer);
+    return buffer;
+  }
 
   // @UseGuards(JwtAuthGuard)
   // @Get('/propertyForSale')

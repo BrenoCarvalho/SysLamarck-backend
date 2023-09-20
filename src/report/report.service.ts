@@ -3,16 +3,32 @@ import { LocatorService } from 'src/locator/locator.service';
 import { PropertyService } from 'src/property/property.service';
 import { ContractService } from 'src/tenant/contract/contract.service';
 import { TenantService } from 'src/tenant/tenant.service';
-import { Between } from 'typeorm';
+import RentReceipt from '../templates/rentReceipt';
+import { Tenant } from 'src/tenant/tenant.entity';
 
 @Injectable()
 export class ReportService {
-  constructor(
-    private propertyService: PropertyService,
-    private tenantService: TenantService,
-    private locatorService: LocatorService,
-    private contractService: ContractService,
-  ) {}
+  constructor() {}
+
+  async downloadPdfTest(): Promise<any> {
+    //  return await htmlPDF.create(RentReceipt(), { format: 'A4' });
+    // return new Promise(function (resolve, reject) {
+    // some async operation here
+    // create(
+    //   htmlTxt
+    //     .toString()
+    //     .replaceAll('{{locatorFullName}}', 'Breno de Carvalho'),
+    // ).toBuffer((err, buffer) => {
+    //   if (err) {
+    //     //res.json(responses.genericError(500, 'Internal server error.'));
+    //   } else {
+    //     // res.type('application/pdf');
+    //     // res.statusCode = 200;
+    //     resolve(buffer);
+    //   }
+    // });
+    // });
+  }
 
   // async propertyForSale(): Promise<any> {
   //   const properties = await this.propertyService.findAll({

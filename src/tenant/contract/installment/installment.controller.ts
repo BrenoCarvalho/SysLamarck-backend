@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Post,
+  Query,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { InstallmentService } from './installment.service';
 import { Installment } from './installment.entity';
@@ -22,7 +32,7 @@ export class InstallmentController {
 
   @UseGuards(JwtAuthGuard)
   @Post('pay')
-  async pay(@Param() params: any, @Body() body: any): Promise<number> {
+  async pay(@Param() params: any, @Body() body: any): Promise<any> {
     const { amount, data, formOfPayment } = body;
 
     return await this.installmentService.pay({
@@ -31,6 +41,31 @@ export class InstallmentController {
       data,
       formOfPayment,
     });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':installmentId/receipt')
+  async receipt(
+    @Param() params: any,
+    @Query() query: any,
+    @Res() res: any,
+  ): Promise<any> {
+    const buffer = await this.installmentService.receipt({
+      installmentId: +params.installmentId,
+      mode: query.mode,
+    });
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename=recibo.pdf`,
+      'Content-Length': buffer?.length,
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: 0,
+    });
+
+    res.end(buffer);
+    return;
   }
 
   @UseGuards(JwtAuthGuard)
