@@ -41,10 +41,10 @@ export class Contract {
   @Column({ length: 50, nullable: true })
   reajust: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'float' })
   integralValue: number;
 
-  @Column('int')
+  @Column('float')
   leaseAmount: number;
 
   @Column('int')

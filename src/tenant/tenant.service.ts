@@ -48,7 +48,7 @@ export class TenantService {
   }
 
   async update(id: number, data: TenantCreateDto): Promise<string> {
-    let tenant = await this.tenantRepository.findOne({
+    const tenant = await this.tenantRepository.findOne({
       where: { id },
       relations: { property: true, contract: true },
     });
@@ -59,7 +59,7 @@ export class TenantService {
       return [item[0], data[item[0]] ? data[item[0]] : item[1]];
     });
 
-    tenant = {
+    const newTenantData = {
       ...Object.fromEntries(tenantArrayEntries),
       property:
         data?.propertyCode &&
@@ -71,13 +71,15 @@ export class TenantService {
       residents: JSON.stringify(data?.residents),
     };
 
+    delete newTenantData['contract'];
+
     return this.tenantRepository
-      .update({ id }, tenant)
+      .update({ id }, newTenantData)
       .then(async () => {
         const msg = `Tenant ${id} updated as successfuly`;
         console.log(msg);
 
-        await this.contractService.update(tenant?.contract?.id, data);
+        // await this.contractService.update(tenant?.contract?.id, data);
 
         return msg;
       })
