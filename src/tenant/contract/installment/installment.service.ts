@@ -6,6 +6,7 @@ import {
   NotFoundException,
   forwardRef,
   BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Installment } from './installment.entity';
@@ -16,12 +17,16 @@ import { TransactionService } from 'src/cashier/transaction/transaction.service'
 import { Transaction } from 'src/cashier/transaction/transaction.entity';
 import { ReportService } from 'src/report/report.service';
 import { create as buildHtml } from 'puppeteer-html-pdf';
-import RentReceipt from 'src/templates/rentReceipt';
+import {
+  RentReceiptDefaultProps,
+  RentReceiptForLocator,
+  RentReceiptForTenant,
+} from 'src/templates/rentReceipt';
 import {
   currencyFormatter,
   dateFormatter,
   propertyCodeFormatter,
-} from 'src/templates/formatters';
+} from 'src/utils/formatters';
 
 const monthNames = [
   'Janeiro',
@@ -96,6 +101,187 @@ export class InstallmentService {
     }
   }
 
+  defaultDataForReceipt({
+    installment,
+  }: {
+    installment: Installment;
+  }): RentReceiptDefaultProps {
+    const dueDate = dateFormatter({
+      value: installment.dueDate,
+    });
+
+    const referenceMonth = `${
+      monthNames.indexOf(installment.referenceMonth) + 1
+    }/${dueDate.slice(6)}`;
+
+    const paymentDate = new Date(
+      installment.transaction[0].createdAt,
+    ).toLocaleDateString('pt-BR', {
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric',
+    });
+
+    return {
+      tenant: {
+        fullName: installment.contract.tenant.fullName,
+      },
+      locator: {
+        fullName: installment.contract.tenant.property.locator.fullName,
+      },
+      property: {
+        address: installment.contract.tenant.property.address,
+        propertyCode: propertyCodeFormatter({
+          value: installment.contract.tenant.property.propertyCode,
+        }),
+      },
+      installment: {
+        referenceMonth,
+        dueDateMonth: dueDate.slice(3),
+        dueDate,
+        paymentDate: paymentDate,
+        currentInstallment: installment.currentInstallment,
+      },
+    };
+  }
+
+  async generateReceiptForTenant({
+    installment,
+  }: {
+    installment: Installment;
+  }): Promise<Buffer> {
+    if (!installment.transaction[0]) {
+      throw new InternalServerErrorException(
+        'Installment missing credit transaction data.',
+      );
+    }
+
+    const creditTransactionData = JSON.parse(installment.transaction[0]?.data);
+
+    return buildHtml(
+      RentReceiptForTenant({
+        ...this.defaultDataForReceipt({ installment }),
+        creditTransaction: {
+          amount: currencyFormatter({
+            value: installment.transaction[0].amount,
+          }),
+          rent: currencyFormatter({ value: creditTransactionData['rent'] }),
+          iptu: currencyFormatter({ value: creditTransactionData['iptu'] }),
+          water: currencyFormatter({
+            value: creditTransactionData['water'],
+          }),
+          eletricity: currencyFormatter({
+            value: creditTransactionData['eletricity'],
+          }),
+          condominium: currencyFormatter({
+            value: creditTransactionData['condominium'],
+          }),
+          incomeTax: currencyFormatter({
+            value: creditTransactionData['incomeTax'],
+          }),
+          specialDiscount: currencyFormatter({
+            value: creditTransactionData['specialDiscount'],
+          }),
+          breachOfContractFine: currencyFormatter({
+            value: creditTransactionData['breachOfContractFine'],
+          }),
+          sundry: creditTransactionData['sundry'],
+          sundryDescription: creditTransactionData['sundryDescription'],
+        },
+      }),
+      { format: 'A4' },
+    );
+  }
+
+  async generateReceiptForLocator({
+    installment,
+  }: {
+    installment: Installment;
+  }): Promise<Buffer> {
+    if (!installment.transaction[0]) {
+      throw new InternalServerErrorException(
+        'Installment missing credit transaction data.',
+      );
+    } else if (!installment.transaction[1]) {
+      throw new InternalServerErrorException(
+        'Installment missing debit transaction data.',
+      );
+    }
+
+    const creditTransactionData = JSON.parse(installment.transaction[0]?.data);
+    const debitTransactionData = JSON.parse(installment.transaction[1]?.data);
+
+    return buildHtml(
+      RentReceiptForLocator({
+        ...this.defaultDataForReceipt({ installment }),
+        creditTransaction: {
+          amount: currencyFormatter({
+            value: creditTransactionData.amount,
+          }),
+          rent: currencyFormatter({ value: creditTransactionData['rent'] }),
+          iptu: currencyFormatter({ value: creditTransactionData['iptu'] }),
+          water: currencyFormatter({
+            value: creditTransactionData['water'],
+          }),
+          eletricity: currencyFormatter({
+            value: creditTransactionData['eletricity'],
+          }),
+          condominium: currencyFormatter({
+            value: creditTransactionData['condominium'],
+          }),
+          incomeTax: currencyFormatter({
+            value: creditTransactionData['incomeTax'],
+          }),
+          specialDiscount: currencyFormatter({
+            value: creditTransactionData['specialDiscount'],
+          }),
+          breachOfContractFine: currencyFormatter({
+            value: creditTransactionData['breachOfContractFine'],
+          }),
+          sundry: currencyFormatter({
+            value: debitTransactionData['sundry'],
+          }),
+          sundryDescription: creditTransactionData['sundryDescription'],
+        },
+        debitTransaction: {
+          amount: currencyFormatter({
+            value: debitTransactionData.amount,
+          }),
+          water: currencyFormatter({
+            value: debitTransactionData['water'],
+          }),
+          rent: currencyFormatter({
+            value: debitTransactionData['rent'],
+          }),
+          eletricity: currencyFormatter({
+            value: debitTransactionData['eletricity'],
+          }),
+          iptu: currencyFormatter({ value: debitTransactionData['iptu'] }),
+          incomeTax: currencyFormatter({
+            value: debitTransactionData['incomeTax'],
+          }),
+          condominium: currencyFormatter({
+            value: debitTransactionData['condominium'],
+          }),
+          administrationFee: currencyFormatter({
+            value: debitTransactionData['administrationFee'],
+          }),
+          leaseFee: currencyFormatter({
+            value: debitTransactionData['leaseFee'],
+          }),
+          sundry: currencyFormatter({
+            value: debitTransactionData['sundry'],
+          }),
+          sundryDescription: debitTransactionData['sundryDescription'],
+        },
+      }),
+
+      {
+        format: 'A4',
+      },
+    );
+  }
+
   async receipt({
     installmentId,
     mode,
@@ -116,61 +302,11 @@ export class InstallmentService {
       ],
     });
 
-    const dueDate = dateFormatter({
-      value: installment.dueDate,
-    });
-
-    const referentialMonth = `${
-      monthNames.indexOf(installment.referenceMonth) + 1
-    }/${dueDate.slice(6)}`;
-
-    const paymentDate = new Date(
-      installment.transaction[0].createdAt,
-    ).toLocaleDateString('pt-BR', {
-      month: '2-digit',
-      day: '2-digit',
-      year: 'numeric',
-    });
-
-    const transactionData = JSON.parse(installment.transaction[0].data);
-
-    const buffer = buildHtml(
-      RentReceipt({
-        tenantFullName: installment.contract.tenant.fullName,
-        propertyAddress: installment.contract.tenant.property.address,
-        locatorFullName: installment.contract.tenant.property.locator.fullName,
-        propertyCode: propertyCodeFormatter({
-          value: installment.contract.tenant.property.propertyCode,
-        }),
-        referentialMonth,
-        dueDateMonth: dueDate.slice(3),
-        dueDate,
-        paymentDate: paymentDate,
-        currentInstallment: installment.currentInstallment,
-        installmentTransactionAmount: currencyFormatter({
-          value: installment.transaction[0].amount,
-        }),
-        rent: currencyFormatter({ value: transactionData['rent'] }),
-        iptu: currencyFormatter({ value: transactionData['iptu'] }),
-        water: currencyFormatter({ value: transactionData['water'] }),
-        eletricity: currencyFormatter({ value: transactionData['eletricity'] }),
-        condominium: currencyFormatter({
-          value: transactionData['condominium'],
-        }),
-        incomeTax: currencyFormatter({ value: transactionData['incomeTax'] }),
-        specialDiscount: currencyFormatter({
-          value: transactionData['specialDiscount'],
-        }),
-        breachOfContractFine: currencyFormatter({
-          value: transactionData['breachOfContractFine'],
-        }),
-      }),
-      {
-        format: 'A4',
-      },
-    );
-
-    return buffer;
+    if (mode == 'tenant') {
+      return await this.generateReceiptForTenant({ installment });
+    } else {
+      return await this.generateReceiptForLocator({ installment });
+    }
   }
 
   async pay({
@@ -232,6 +368,27 @@ export class InstallmentService {
       formOfPayment,
       installment,
     });
+  }
+
+  async update(contract: Contract) {
+    const installments = await this.installmentRepository.findBy({
+      contract: { id: contract.id },
+    });
+
+    return await Promise.all(
+      installments.map(async (installment) => {
+        const newDueDate = new Date(installment.dueDate);
+        newDueDate.setDate(contract.payday);
+
+        installment.amount = contract.leaseAmount;
+        installment.dueDate = newDueDate;
+
+        await this.installmentRepository.update(
+          { id: installment.id },
+          installment,
+        );
+      }),
+    );
   }
 
   async create(data: InstallmentCreateDto): Promise<Installment> {

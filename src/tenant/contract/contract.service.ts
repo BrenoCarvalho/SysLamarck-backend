@@ -21,6 +21,10 @@ export class ContractService {
     private bailService: BailService,
   ) {}
 
+  async findBy(conditionals): Promise<Contract[]> {
+    return await this.contractRepository.findBy(conditionals);
+  }
+
   async findByMonth(
     month: string | number,
     type: 'start' | 'end',
@@ -57,7 +61,10 @@ export class ContractService {
   async update(id: number, data: ContractCreateDto): Promise<string> {
     let contract = await this.contractRepository.findOne({
       where: { id },
+      loadRelationIds: true,
     });
+
+    await this.bailService.update(contract.id, data);
 
     if (!contract) throw new NotFoundException(`Contract ${id} not found`);
 
@@ -66,14 +73,17 @@ export class ContractService {
     });
 
     contract = Object.fromEntries(contractArrayEntries);
+    delete contract['id'];
+    delete contract['bail'];
+    delete contract['installment'];
 
     return this.contractRepository
-      .update({ id }, contract)
+      .update({ id }, { ...contract })
       .then(async () => {
         const msg = `Contract ${id} updated as successfuly`;
         console.log(msg);
 
-        await this.bailService.update(contract.id, data);
+        await this.installmentService.update(contract);
 
         return msg;
       })

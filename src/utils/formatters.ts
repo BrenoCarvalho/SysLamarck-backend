@@ -50,7 +50,7 @@ const installmentStatusFormatter = ({ value }: { value: string }) => {
   return statusNames[value];
 };
 
-const currencyFormatter = ({ value }: { value: any }) => {
+const currencyFormatter = ({ value }: { value: any }): string => {
   if (!value) {
     return 'R$ 0,00';
   }

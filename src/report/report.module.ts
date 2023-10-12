@@ -7,7 +7,12 @@ import { LocatorModule } from 'src/locator/locator.module';
 import { ContractModule } from 'src/tenant/contract/contract.module';
 
 @Module({
-  imports: [],
+  imports: [
+    forwardRef(() => PropertyModule),
+    forwardRef(() => TenantModule),
+    LocatorModule,
+    forwardRef(() => ContractModule),
+  ],
   controllers: [ReportController],
   providers: [ReportService],
   exports: [ReportService],

@@ -32,6 +32,16 @@ export class CashierService {
     return cashier;
   }
 
+  async getCashiersClosedByDate({
+    date,
+  }: {
+    date: string;
+  }): Promise<Cashier[]> {
+    console.log(date);
+
+    return await this.cashierRepository.findBy({ closedAt: new Date(date) });
+  }
+
   async close(): Promise<number> {
     const cashier = await this.openedCashier();
     if (!cashier) throw new NotFoundException(`No cashier open`);

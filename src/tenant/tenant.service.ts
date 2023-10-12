@@ -40,7 +40,10 @@ export class TenantService {
   }
 
   async findBy(by: object): Promise<Tenant[]> {
-    return await this.tenantRepository.findBy(by);
+    return await this.tenantRepository.find({
+      where: by,
+      relations: { property: true },
+    });
   }
 
   async delete(id: number): Promise<number> {
@@ -73,13 +76,13 @@ export class TenantService {
 
     delete newTenantData['contract'];
 
+    await this.contractService.update(tenant?.contract?.id, data);
+
     return this.tenantRepository
       .update({ id }, newTenantData)
       .then(async () => {
         const msg = `Tenant ${id} updated as successfuly`;
         console.log(msg);
-
-        // await this.contractService.update(tenant?.contract?.id, data);
 
         return msg;
       })

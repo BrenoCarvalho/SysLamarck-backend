@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -24,6 +25,14 @@ export class CashierController {
   @Get(':id')
   async findOne(@Param() params): Promise<Cashier> {
     return await this.cashierService.findOne(params?.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/getCashiersClosedByDate')
+  async getCashiersClosedByDate(@Query() query): Promise<Cashier[]> {
+    const { date } = query;
+
+    return await this.cashierService.getCashiersClosedByDate({ date });
   }
 
   @UseGuards(JwtAuthGuard)

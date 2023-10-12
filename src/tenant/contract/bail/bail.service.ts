@@ -36,12 +36,14 @@ export class BailService {
     return this.bailRepository.findOneBy({ id });
   }
 
-  async update(contractId: number, data: BailCreateDto): Promise<string> {
+  async update(id: number, data: BailCreateDto): Promise<string> {
+    delete data['id'];
+
     let bail = await this.bailRepository.findOneBy({
-      contract: { id: contractId },
+      id,
     });
 
-    if (!bail) throw new NotFoundException(`Contract ${contractId} not found`);
+    if (!bail) throw new NotFoundException(`Bail ${id} not found`);
 
     const bailArrayEntries = Object.entries(bail).map((item) => {
       return [item[0], data[item[0]] ? data[item[0]] : item[1]];
@@ -49,8 +51,8 @@ export class BailService {
 
     bail = Object.fromEntries(bailArrayEntries);
 
-    return this.bailRepository
-      .update({ id: bail?.id }, bail)
+    return await this.bailRepository
+      .update({ id }, { ...bail })
       .then(() => {
         const msg = `Bail ${bail?.id} updated as successfuly`;
         console.log(msg);
