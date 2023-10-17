@@ -4,6 +4,7 @@ import {
   HttpException,
   HttpStatus,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Contract } from './contract.entity';
@@ -11,6 +12,9 @@ import { ContractCreateDto } from './dto/contract.create.dto';
 import { Tenant } from 'src/tenant/tenant.entity';
 import { InstallmentService } from './installment/installment.service';
 import { BailService } from './bail/bail.service';
+import { create as buildHtml } from 'puppeteer-html-pdf';
+import { TenantService } from '../tenant.service';
+import ContractToPrint from 'src/templates/contract';
 
 @Injectable()
 export class ContractService {
@@ -19,6 +23,8 @@ export class ContractService {
     private contractRepository: Repository<Contract>,
     private installmentService: InstallmentService,
     private bailService: BailService,
+    @Inject(forwardRef(() => TenantService))
+    private tenantService: TenantService,
   ) {}
 
   async findBy(conditionals): Promise<Contract[]> {
@@ -56,6 +62,12 @@ export class ContractService {
         currentInstallment: showCurrentInstallment,
       },
     });
+  }
+
+  async print({ tenantId }: { tenantId: number }): Promise<Buffer> {
+    const tenant = await this.tenantService.findOne(tenantId);
+
+    return buildHtml(ContractToPrint({}), { format: 'A4' });
   }
 
   async update(id: number, data: ContractCreateDto): Promise<string> {

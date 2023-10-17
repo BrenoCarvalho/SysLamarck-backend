@@ -197,18 +197,20 @@ export class ReportService {
   }
 
   async rgiEdp(): Promise<any> {
-    const properties = await this.propertyService.findAll();
+    const properties = await this.propertyService.findAll({
+      relations: { locator: true },
+    });
     const propertiesFormatted = [];
 
     await Promise.all(
       properties.map((value) => {
         propertiesFormatted.push({
-          locator: value?.locator,
-          propertyCode: value?.propertyCode,
-          address: value?.address,
-          rgi: value?.rgi,
-          supply: value?.supply,
-          edpInstallation: value?.edpInstallation,
+          locator: value.locator.id,
+          propertyCode: value.propertyCode,
+          address: value.address,
+          rgi: value.rgi,
+          supply: value.supply,
+          edpInstallation: value.edpInstallation,
         });
       }),
     );

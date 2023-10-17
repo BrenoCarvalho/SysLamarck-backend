@@ -6,7 +6,7 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { Cashier } from './cashier.entity';
 
 @Injectable()
@@ -37,9 +37,15 @@ export class CashierService {
   }: {
     date: string;
   }): Promise<Cashier[]> {
-    console.log(date);
+    const dateMin = new Date(date);
+    const dateMax = new Date(date);
+    dateMax.setUTCHours(23, 59, 59);
 
-    return await this.cashierRepository.findBy({ closedAt: new Date(date) });
+    const cashiers = await this.cashierRepository.findBy({
+      closedAt: Between(dateMin, dateMax),
+    });
+
+    return cashiers;
   }
 
   async close(): Promise<number> {

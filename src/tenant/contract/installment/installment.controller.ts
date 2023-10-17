@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  Inject,
   Param,
   Post,
   Query,
@@ -32,7 +31,7 @@ export class InstallmentController {
 
   @UseGuards(JwtAuthGuard)
   @Post('pay')
-  async pay(@Param() params: any, @Body() body: any): Promise<any> {
+  async pay(@Param() params: any, @Body() body: any): Promise<number> {
     const { amount, data, formOfPayment } = body;
 
     return await this.installmentService.pay({

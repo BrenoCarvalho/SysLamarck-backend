@@ -28,7 +28,7 @@ export class CashierController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/getCashiersClosedByDate')
+  @Get('/cashiersClosedByDate/list')
   async getCashiersClosedByDate(@Query() query): Promise<Cashier[]> {
     const { date } = query;
 

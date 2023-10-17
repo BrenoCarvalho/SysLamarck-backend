@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ContractService } from './contract.service';
 import { Contract } from './contract.entity';
@@ -16,6 +24,30 @@ export class ContractController {
       showAllInstallments: !!Number(query?.showAllInstallments),
       showCurrentInstallment: !!Number(query?.showCurrentInstallment),
     });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/print')
+  async receipt(
+    @Param() params: any,
+    @Query() query: any,
+    @Res() res: any,
+  ): Promise<any> {
+    const { id } = params;
+
+    const buffer = await this.contractService.print({ tenantId: +id });
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename=fichaDeCadastro.pdf`,
+      'Content-Length': buffer?.length,
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: 0,
+    });
+
+    res.end(buffer);
+    return;
   }
 
   @UseGuards(JwtAuthGuard)
