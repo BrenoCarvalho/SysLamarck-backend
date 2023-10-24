@@ -56,6 +56,9 @@ export class Contract {
   @Column('int', { nullable: true })
   gracePeriod: number;
 
+  @Column('int', { nullable: true })
+  installmentsPaid: number;
+
   @Column({ type: 'date' })
   start: Date;
 

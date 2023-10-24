@@ -15,7 +15,6 @@ import { Contract } from '../contract.entity';
 import { ContractService } from '../contract.service';
 import { TransactionService } from 'src/cashier/transaction/transaction.service';
 import { Transaction } from 'src/cashier/transaction/transaction.entity';
-import { ReportService } from 'src/report/report.service';
 import { create as buildHtml } from 'puppeteer-html-pdf';
 import {
   RentReceiptDefaultProps,
@@ -51,7 +50,6 @@ export class InstallmentService {
     @Inject(forwardRef(() => ContractService))
     private contractService: ContractService,
     private transactionService: TransactionService,
-    private readonly reportService: ReportService,
   ) {}
 
   async findOne(id: number): Promise<Installment> {
@@ -96,7 +94,12 @@ export class InstallmentService {
         currentInstallment: `${month}/${contract?.duration}`,
         dueDate: dueDate,
         amount: contract?.leaseAmount,
-        status: month <= contract?.gracePeriod ? 'Ca' : 'Dv',
+        status:
+          month <= contract?.installmentsPaid ?? 0
+            ? 'Pg'
+            : month <= contract?.gracePeriod + (contract?.installmentsPaid ?? 0)
+            ? 'Ca'
+            : 'Dv',
       });
     }
   }

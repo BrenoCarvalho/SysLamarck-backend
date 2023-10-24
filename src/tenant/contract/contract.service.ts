@@ -133,7 +133,7 @@ export class ContractService {
 
     const end = new Date();
     end.setDate(data?.payday - 1);
-    end.setMonth(start.getMonth() + data?.duration);
+    end.setMonth(end.getMonth() + Number(data?.duration));
 
     const contract = this.contractRepository.create({
       ...data,
@@ -141,6 +141,7 @@ export class ContractService {
       duration: Number(data?.duration),
       payday: Number(data?.payday),
       gracePeriod: Number(data?.gracePeriod),
+      installmentsPaid: Number(data?.installmentsPaid),
       start,
       end,
     });

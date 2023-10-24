@@ -12,4 +12,5 @@ export interface ContractCreateDto extends BailCreateDto {
   duration: number;
   payday: number;
   gracePeriod?: number;
+  installmentsPaid?: number;
 }
