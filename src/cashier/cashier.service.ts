@@ -8,6 +8,9 @@ import {
 } from '@nestjs/common';
 import { Between, Repository } from 'typeorm';
 import { Cashier } from './cashier.entity';
+import CashFlowReport from 'src/templates/cashFlowReport';
+import { currencyFormatter } from 'src/utils/formatters';
+import { create as buildHtml } from 'puppeteer-html-pdf';
 
 @Injectable()
 export class CashierService {
@@ -30,6 +33,112 @@ export class CashierService {
     });
 
     return cashier;
+  }
+
+  async generateCashFlowReport({
+    cashier,
+  }: {
+    cashier: Cashier;
+  }): Promise<Buffer> {
+    const cashierGenericTransactions =
+      cashier?.transaction?.filter(
+        (transaction) => transaction.category === 'generic',
+      ) ?? [];
+    const cashierRentTransactions = cashier?.transaction?.filter(
+      (transaction) => transaction.category === 'rent',
+    );
+
+    const genericTransactions =
+      cashierGenericTransactions.map((transaction) => ({
+        description: transaction.description,
+        type: transaction.type === 'credit' ? 'Crédito' : 'Débito',
+        amount: currencyFormatter({ value: transaction.amount ?? 0 }),
+        formOfPayment: transaction.formOfPayment ?? 'Não informado',
+      })) ?? [];
+
+    const rentTransactions =
+      cashierRentTransactions?.map((transaction) => {
+        const amount = currencyFormatter({ value: transaction.amount ?? 0 });
+
+        return {
+          tenant: {
+            fullName: '',
+          },
+          amount,
+          type: transaction.type === 'credit' ? 'Crédito' : 'Débito',
+          formOfPayment: transaction.formOfPayment ?? 'Não informado',
+        };
+      }) ?? [];
+
+    const totalGenericTransactions = cashierGenericTransactions.reduce(
+      (old, transaction) => {
+        const debit = transaction.type === 'debit' ? transaction.amount : 0;
+        const credit = transaction.type === 'credit' ? transaction.amount : 0;
+
+        return {
+          debit: old.debit + debit,
+          credit: old.credit + credit,
+        };
+      },
+      { debit: 0, credit: 0 },
+    );
+
+    const totalGenericTransactionsFormatted = {
+      credit: currencyFormatter({
+        value: totalGenericTransactions.credit,
+      }),
+      debit: currencyFormatter({
+        value: totalGenericTransactions.debit,
+      }),
+    };
+
+    const totalRentTransactions = cashierRentTransactions.reduce(
+      (old, transaction) => {
+        const debit = transaction.type === 'debit' ? transaction.amount : 0;
+        const credit = transaction.type === 'credit' ? transaction.amount : 0;
+
+        return {
+          debit: old.debit + debit,
+          credit: old.credit + credit,
+        };
+      },
+      { debit: 0, credit: 0 },
+    );
+
+    const totalRentTransactionsFormatted = {
+      credit: currencyFormatter({
+        value: totalRentTransactions.credit,
+      }),
+      debit: currencyFormatter({
+        value: totalRentTransactions.debit,
+      }),
+    };
+
+    return buildHtml(
+      CashFlowReport({
+        cashier: {
+          closedAt: cashier.closedAt.toLocaleDateString('pt-BR', {}),
+          name: cashier.name,
+          genericTransactions,
+          rentTransactions,
+          totalGenericTransactions: totalGenericTransactionsFormatted,
+          totalRentTransactions: totalRentTransactionsFormatted,
+        },
+      }),
+      { format: 'A4' },
+    );
+  }
+
+  async cashFlowReport({ cashierId }: { cashierId: number }): Promise<Buffer> {
+    const cashier = await this.cashierRepository.findOne({
+      where: { id: cashierId },
+      relations: { transaction: true },
+    });
+
+    if (!cashier)
+      throw new NotFoundException(`cashier ${cashierId} not found.`);
+
+    return await this.generateCashFlowReport({ cashier });
   }
 
   async getCashiersClosedByDate({

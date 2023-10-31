@@ -5,6 +5,7 @@ import {
   Param,
   Post,
   Query,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -33,6 +34,30 @@ export class CashierController {
     const { date } = query;
 
     return await this.cashierService.getCashiersClosedByDate({ date });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/:id/cashFlowReport')
+  async getCashFlowReport(
+    @Query() query,
+    @Param() params,
+    @Res() res,
+  ): Promise<any> {
+    const buffer = await this.cashierService.cashFlowReport({
+      cashierId: +params.id,
+    });
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename=fluxoDeCaixa.pdf`,
+      'Content-Length': buffer?.length,
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: 0,
+    });
+
+    res.end(buffer);
+    return;
   }
 
   @UseGuards(JwtAuthGuard)
