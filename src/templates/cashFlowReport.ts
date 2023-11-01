@@ -101,7 +101,7 @@ const html = `<!DOCTYPE html>
                 <p><b>ENTRADAS - {{cashier.totalGenericTransactions.credit}}</b></p>
             </div>
             <div>
-                <p><b>SAÍDAS - {{cashier.totalGenericTransactions.credit}}</b></p>
+                <p><b>SAÍDAS - {{cashier.totalGenericTransactions.debit}}</b></p>
             </div>
         </div>
     </div>
@@ -154,10 +154,10 @@ const html = `<!DOCTYPE html>
     <div class="linhaBaixo">
       <p><b>TOTAL GERAL DO FLUXO DE CAIXA</b></p>  
     </div>
-    <p><b>Total de <u>taxa de administração</u> sobre alugueis:</b> {{cs}}</p>
-    <p><b>Total de <u>entradas</u>:</b> {{kkk}}</p>
-    <p><b>Total de <u>saídas</u>:</b> {{as}}</p>
-    <p><b>SALDO FINAL:</b>  {{r}} - {{x}} </p>    
+    <p><b>Total de <u>taxa de administração</u> sobre alugueis:</b> {{cashier.adiministrationFee}}</p>
+    <p><b>Total de <u>entradas</u>:</b> {{cashier.totalCredit}}</p>
+    <p><b>Total de <u>saídas</u>:</b> {{cashier.totalDebit}}</p>
+    <p><b>SALDO FINAL:</b> {{cashier.balance}} </p>    
 </body>
 </html>
 `;
@@ -194,6 +194,11 @@ interface CashFlowReportProps {
       debit: string;
       credit: string;
     };
+
+    administrationFee: string;
+    totalCredit: string;
+    totalDebit: string;
+    balance: string;
   };
 }
 

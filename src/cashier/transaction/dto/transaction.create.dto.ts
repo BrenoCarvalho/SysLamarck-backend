@@ -6,6 +6,7 @@ export interface TransactionCreateDto {
   amount: number;
   formOfPayment?: string;
   description?: string;
-  data?: string;
+  data?: string | object;
+  metadata?: string | object;
   installment?: Installment;
 }

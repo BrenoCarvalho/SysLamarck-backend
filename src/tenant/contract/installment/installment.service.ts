@@ -317,11 +317,13 @@ export class InstallmentService {
     amount,
     formOfPayment,
     data,
+    metadata,
   }: {
     tenantId: number;
     amount: number;
     formOfPayment: string;
-    data: string;
+    data: string | object;
+    metadata: string | object;
   }): Promise<number> {
     const contract = await this.contractService.findOneByTenantId({
       tenantId,
@@ -338,6 +340,7 @@ export class InstallmentService {
       amount,
       formOfPayment,
       data,
+      metadata,
       installment: contract?.currentInstallment,
     });
 
@@ -359,7 +362,7 @@ export class InstallmentService {
     installmentId: number;
     amount: number;
     formOfPayment: string;
-    data: string;
+    data: string | object;
   }): Promise<Transaction> {
     const installment = await this.findOne(installmentId);
 

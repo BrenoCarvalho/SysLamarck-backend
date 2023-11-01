@@ -62,7 +62,9 @@ export class CashierService {
 
         return {
           tenant: {
-            fullName: '',
+            fullName:
+              JSON.parse(transaction?.metadata ?? '{}')?.tenant?.fullName ??
+              'Não informado',
           },
           amount,
           type: transaction.type === 'credit' ? 'Crédito' : 'Débito',
@@ -114,6 +116,21 @@ export class CashierService {
       }),
     };
 
+    const totalCredit = currencyFormatter({
+      value: totalRentTransactions.credit + totalGenericTransactions.credit,
+    });
+
+    const totalDebit = currencyFormatter({
+      value: totalRentTransactions.debit + totalGenericTransactions.debit,
+    });
+
+    const balance = currencyFormatter({
+      value:
+        totalRentTransactions.credit +
+        totalGenericTransactions.credit -
+        (totalRentTransactions.debit + totalGenericTransactions.debit),
+    });
+
     return buildHtml(
       CashFlowReport({
         cashier: {
@@ -123,6 +140,10 @@ export class CashierService {
           rentTransactions,
           totalGenericTransactions: totalGenericTransactionsFormatted,
           totalRentTransactions: totalRentTransactionsFormatted,
+          administrationFee: '',
+          totalCredit,
+          totalDebit,
+          balance,
         },
       }),
       { format: 'A4' },

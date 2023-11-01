@@ -32,6 +32,9 @@ export class Transaction {
   @Column({ length: 2048, nullable: true })
   data: string;
 
+  @Column({ length: 4096, nullable: true })
+  metadata: string;
+
   @ManyToOne(() => Installment, { onDelete: 'SET NULL' })
   @JoinColumn()
   installment: Installment;

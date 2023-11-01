@@ -50,6 +50,7 @@ export class TransactionService {
     const transaction = this.transactionRepository.create({
       ...data,
       data: JSON.stringify(data?.data),
+      metadata: JSON.stringify(data?.metadata),
       cashier,
     });
 

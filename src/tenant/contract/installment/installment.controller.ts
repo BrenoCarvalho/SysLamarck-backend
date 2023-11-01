@@ -32,12 +32,13 @@ export class InstallmentController {
   @UseGuards(JwtAuthGuard)
   @Post('pay')
   async pay(@Param() params: any, @Body() body: any): Promise<number> {
-    const { amount, data, formOfPayment } = body;
+    const { amount, data, formOfPayment, metadata } = body;
 
     return await this.installmentService.pay({
       tenantId: params?.tenantId,
       amount,
       data,
+      metadata,
       formOfPayment,
     });
   }
