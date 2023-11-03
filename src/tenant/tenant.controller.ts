@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { TenantService } from './tenant.service';
@@ -27,6 +28,26 @@ export class TenantController {
   @Get(':id')
   async findOne(@Param() params): Promise<Tenant> {
     return this.tenantService.findOne(params.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/:id/registrationForm')
+  async registrationForm(@Param() params, @Res() res): Promise<void> {
+    const buffer = await this.tenantService.registrationForm({
+      tenantId: +params.id,
+    });
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename=registrationForm.pdf`,
+      'Content-Length': buffer?.length,
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: 0,
+    });
+
+    res.end(buffer);
+    return;
   }
 
   @UseGuards(JwtAuthGuard)
