@@ -44,6 +44,16 @@ export class InstallmentController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post('rollbackPayment/:installmentId')
+  async rollbackPayment(@Param() params: any): Promise<number> {
+    const { installmentId } = params;
+
+    return await this.installmentService.rollbackPayment({
+      installmentId: +installmentId,
+    });
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get(':installmentId/receipt')
   async receipt(
     @Param() params: any,
@@ -66,6 +76,16 @@ export class InstallmentController {
 
     res.end(buffer);
     return;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('rollbackPaymentTransfer/:installmentId')
+  async rollbackPaymentTransfer(@Param() params: any): Promise<number> {
+    const { installmentId } = params;
+
+    return await this.installmentService.rollbackPaymentTransfer({
+      installmentId: +installmentId,
+    });
   }
 
   @UseGuards(JwtAuthGuard)

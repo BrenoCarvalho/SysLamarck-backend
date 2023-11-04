@@ -112,9 +112,17 @@ export class ContractService {
   async updateCurrentInstallment(tenantId: number): Promise<number> {
     const installments = await this.installmentService.findByTenantId(tenantId);
 
-    const unpaidInstallments = installments.filter(
-      (installment) => installment.status === 'Dv',
-    );
+    const unpaidInstallments = installments
+      .filter((installment) => installment.status === 'Dv')
+      .sort(
+        (a, b) =>
+          Number(
+            a.currentInstallment.substring(0, a.currentInstallment.length - 3),
+          ) -
+          Number(
+            b.currentInstallment.substring(0, b.currentInstallment.length - 3),
+          ),
+      );
 
     if (unpaidInstallments?.length > 0)
       return (

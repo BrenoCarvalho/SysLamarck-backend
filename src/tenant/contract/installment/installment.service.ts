@@ -73,13 +73,25 @@ export class InstallmentService {
   async findByTenantId(tenantId: number): Promise<Installment[]> {
     if (!tenantId) return;
 
-    return await this.installmentRepository.find({
-      where: { contract: { tenant: { id: tenantId } } },
-      loadRelationIds: true,
-      relations: {
-        transaction: true,
-      },
-    });
+    const installments = (
+      await this.installmentRepository.find({
+        where: { contract: { tenant: { id: tenantId } } },
+        loadRelationIds: true,
+        relations: {
+          transaction: true,
+        },
+      })
+    ).sort(
+      (a, b) =>
+        Number(
+          a.currentInstallment.substring(0, a.currentInstallment.length - 3),
+        ) -
+        Number(
+          b.currentInstallment.substring(0, b.currentInstallment.length - 3),
+        ),
+    );
+
+    return installments;
   }
 
   async generateInstallments(contract: Contract) {
@@ -312,6 +324,39 @@ export class InstallmentService {
     }
   }
 
+  async rollbackPayment({
+    installmentId,
+  }: {
+    installmentId: number;
+  }): Promise<number> {
+    const installment = await this.installmentRepository.findOne({
+      where: { id: installmentId },
+      relations: ['transaction', 'contract', 'contract.tenant'],
+    });
+
+    if (!installment)
+      throw new NotFoundException(`Installment ${installmentId} not found.`);
+
+    if (installment.status != 'Pg')
+      throw new BadRequestException('Installment is not paid.');
+
+    await Promise.all(
+      installment.transaction?.map(
+        async (transaction) =>
+          await this.transactionService.delete(transaction.id),
+      ),
+    );
+
+    await this.installmentRepository.update(
+      { id: installment.id },
+      { status: 'Dv' },
+    );
+
+    return await this.contractService.updateCurrentInstallment(
+      installment.contract.tenant.id,
+    );
+  }
+
   async pay({
     tenantId,
     amount,
@@ -351,6 +396,30 @@ export class InstallmentService {
     await this.contractService.updateCurrentInstallment(tenantId);
 
     return contract?.currentInstallment?.id;
+  }
+
+  async rollbackPaymentTransfer({
+    installmentId,
+  }: {
+    installmentId: number;
+  }): Promise<number> {
+    const installment = await this.installmentRepository.findOne({
+      where: { id: installmentId },
+      relations: ['transaction', 'contract', 'contract.tenant'],
+    });
+
+    if (!installment)
+      throw new NotFoundException(`Installment ${installmentId} not found.`);
+
+    if (installment.status != 'Pg')
+      throw new BadRequestException('Installment is not paid.');
+
+    if (installment.transaction.length < 2)
+      throw new BadRequestException(
+        'Installment does not have payment transfer.',
+      );
+
+    return await this.transactionService.delete(installment.transaction[1].id);
   }
 
   async transfer({
