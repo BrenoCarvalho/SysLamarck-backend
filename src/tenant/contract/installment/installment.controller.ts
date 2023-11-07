@@ -94,12 +94,13 @@ export class InstallmentController {
     @Param() params: any,
     @Body() body: any,
   ): Promise<Transaction> {
-    const { amount, data, formOfPayment } = body;
+    const { amount, data, formOfPayment, metadata } = body;
 
     return await this.installmentService.transfer({
       installmentId: params?.installmentId,
       amount,
       data,
+      metadata,
       formOfPayment,
     });
   }

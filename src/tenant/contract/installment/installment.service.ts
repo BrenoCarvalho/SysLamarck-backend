@@ -427,11 +427,13 @@ export class InstallmentService {
     amount,
     formOfPayment,
     data,
+    metadata,
   }: {
     installmentId: number;
     amount: number;
     formOfPayment: string;
     data: string | object;
+    metadata: string | object;
   }): Promise<Transaction> {
     const installment = await this.findOne(installmentId);
 
@@ -440,6 +442,7 @@ export class InstallmentService {
       type: 'debit',
       amount,
       data,
+      metadata,
       formOfPayment,
       installment,
     });

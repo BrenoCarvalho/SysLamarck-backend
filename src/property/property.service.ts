@@ -89,27 +89,29 @@ export class PropertyService {
       select: { id: true },
     });
 
-    const propertyCode = [];
+    let propertyIds = [];
 
     response.map((value) => {
-      propertyCode.push(value.id);
+      propertyIds.push(value.id);
     });
 
-    let code = null;
+    propertyIds = propertyIds.sort((a, b) => a - b);
+
+    let id = null;
     let stop = false;
 
-    if (Math.min(...propertyCode) > 1) {
-      code = 1;
+    if (Math.min(...propertyIds) > 1) {
+      id = 1;
     } else {
-      propertyCode.map((value, index) => {
-        if (!stop && propertyCode[index + 1] != value + 1) {
-          code = value + 1;
+      propertyIds.map((value, index) => {
+        if (!stop && propertyIds[index + 1] != value + 1) {
+          id = value + 1;
           stop = true;
         }
       });
     }
 
-    return code;
+    return id;
   }
 
   async generateProperty(locatorId: number): Promise<number> {

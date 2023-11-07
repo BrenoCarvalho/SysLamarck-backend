@@ -36,7 +36,7 @@ export class TenantService {
   async findOne(id: number): Promise<Tenant> {
     const response = await this.tenantRepository.findOne({
       where: { id },
-      relations: ['contract', 'property', 'contract.bail'],
+      relations: ['contract', 'property', 'property.locator', 'contract.bail'],
     });
 
     if (!response) return;
@@ -216,29 +216,31 @@ export class TenantService {
       select: { id: true },
     });
 
-    const tenantsCode = [];
+    let tenantIds = [];
 
     if (response?.length) {
       response.map((value) => {
-        tenantsCode.push(value.id);
+        tenantIds.push(value.id);
       });
     }
 
-    let code = null;
+    tenantIds = tenantIds.sort((a, b) => a - b);
+
+    let id = null;
     let stop = false;
 
-    if (Math.min(...tenantsCode) > 1) {
-      code = 1;
+    if (Math.min(...tenantIds) > 1) {
+      id = 1;
     } else {
-      tenantsCode.map((value, index) => {
-        if (!stop && tenantsCode[index + 1] != value + 1) {
-          code = value + 1;
+      tenantIds.map((value, index) => {
+        if (!stop && tenantIds[index + 1] != value + 1) {
+          id = value + 1;
           stop = true;
         }
       });
     }
 
-    return code;
+    return id;
   }
 
   async create(data: TenantCreateDto): Promise<Tenant> {

@@ -177,7 +177,7 @@ const htmlLocatorVersion = `<!DOCTYPE html>
           <p style="text-align: center"><b>EXTRATO MENSAL</b></p>
         </div>
         <p><b>Locador:</b> {{locator.fullName}}</p>
-        <p><b>Imóvel:</b> {{property.adress}}</p>
+        <p><b>Imóvel:</b> {{property.address}}</p>
         <p><b>Locatário:</b> {{tenant.fullName}}</p>
         <div class="linhaBaixo"></div>
         <p><b>Mês de Referência:</b> {{installment.referenceMonth}} / <b>Data de vencimento:</b> {{installment.dueDate}}</p>
@@ -246,7 +246,7 @@ const htmlLocatorVersion = `<!DOCTYPE html>
           <p style="text-align: center"><b>EXTRATO MENSAL</b></p>
         </div>
         <p><b>Locador:</b> {{locator.fullName}}</p>
-        <p><b>Imóvel:</b> {{property.adress}}</p>
+        <p><b>Imóvel:</b> {{property.address}}</p>
         <p><b>Locatário:</b> {{tenant.fullName}}</p>
         <div class="linhaBaixo"></div>
         <p><b>Mês de Referência:</b> {{installment.referenceMonth}} / <b>Data de vencimento:</b> {{installment.dueDate}}</p>

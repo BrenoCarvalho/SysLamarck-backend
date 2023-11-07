@@ -3,9 +3,9 @@ import { handlebars } from 'hbs';
 const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="http://necolas.github.io/normalize.css/3.0.1/normalize.css">
     <style>
 
         body {
@@ -19,8 +19,7 @@ const html = `<!DOCTYPE html>
         }
 
         p {
-            margin-top: -1px;
-            margin-bottom: -1px;
+            line-height: 3pt;
         }
 
     </style>
@@ -31,7 +30,7 @@ const html = `<!DOCTYPE html>
         <p><b>Endereço:</b> {{locator.address}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Bairro:</b> {{locator.district}}</p>
         <p><b>Cidade:</b> {{locator.city}}&nbsp;&nbsp;&nbsp;&nbsp;<b>CEP:</b> {{locator.cep}}</p>
         <p><b>Contato1:</b> {{locator.contact1}}&nbsp;&nbsp;&nbsp;<b>Contato2:</b> {{locator.contact2}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Email:</b> {{locator.email}}</p>
-        <p><b>CPF:</b> {{locator.cpf}}&nbsp;&nbsp;&nbsp;&nbsp;<b>RG:</b> {{locator.rg}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Data de Nascimento:</b> {{locator.birthDate}}</p>
+        <p><b>CPF:</b> {{locator.cpf}}&nbsp;&nbsp;&nbsp;&nbsp;<b>RG:</b> {{locator.rg}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Data de Nascimento:</b> {{locator.birhtDate}}</p>
         <p><b>Tipo de Conta:</b> {{locator.accountType}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Banco:</b> {{locator.bank}}</p>
         <p><b>N° da Conta:</b> {{locator.accountNumber}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Agência:</b> {{locator.agency}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Aos Cuidados:</b> {{locator.paymentRemittance}}</p>
     </div>
@@ -41,7 +40,7 @@ const html = `<!DOCTYPE html>
         <p><b>Endereço:</b> {{property.address}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Bairro:</b> {{property.district}}</p>
         <p><b>Cidade:</b> {{property.city}}&nbsp;&nbsp;&nbsp;&nbsp;<b>CEP:</b> {{property.cep}}</p>
         <p><b>Contato1:</b> {{tenant.contact1}}&nbsp;&nbsp;&nbsp;<b>Contato2:</b> {{tenant.contact2}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Email:</b> {{tenant.email}}</p>
-        <p><b>CPF: </b>{{tenant.cpf}}&nbsp;&nbsp;&nbsp;&nbsp;<b>RG: </b>{{tenant.rg}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Data de Nascimento: </b>{{tenant.birthDate}}<b>&nbsp;&nbsp;&nbsp;&nbsp;Profissão: </b>{{tenant.profession}}</p>
+        <p><b>CPF: </b>{{tenant.cpf}}&nbsp;&nbsp;&nbsp;&nbsp;<b>RG: </b>{{tenant.rg}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Data de Nascimento: </b>{{tenant.birhtDate}}<b>&nbsp;&nbsp;&nbsp;&nbsp;Profissão: </b>{{tenant.profession}}</p>
         <p><b>Tipo de Contrato: </b>{{contract.goal}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Início: </b>{{contract.start}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Término: </b>{{contract.end}}</p>
         <p><b>Aluguel Integral: </b>{{contract.integralValue}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Aluguel C/Desconto: </b>{{contract.leaseAmount}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Desconto: </b>{{contract.applyDiscount}}</p>
         <p><b>Dia de Pagamento: </b>{{contract.payday}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Tempo de Contrato: </b>{{contract.duration}}</p>
@@ -53,7 +52,7 @@ const html = `<!DOCTYPE html>
         <p><b>Endereço:</b> {{bail.addressG1}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Bairro:</b> {{bail.districtG1}}</p>
         <p><b>Cidade:</b> {{bail.cityG1}}&nbsp;&nbsp;&nbsp;&nbsp;<b>CEP:</b> {{bail.cepG1}}</p>
         <p><b>Contato1:</b> {{bail.contact1G1}}&nbsp;&nbsp;&nbsp;<b>Contato2:</b> {{bail.contact2G1}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Email:</b> {{bail.emailG1}}</p>
-        <p><b>CPF:</b> {{bail.cpfG1}}&nbsp;&nbsp;&nbsp;&nbsp;<b>RG: </b>.{{bailrgG1}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Data de Nascimento:</b> {{bail.birthDateG1}}</p>
+        <p><b>CPF:</b> {{bail.cpfG1}}&nbsp;&nbsp;&nbsp;&nbsp;<b>RG: </b>{{bail.rgG1}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Data de Nascimento:</b> {{bail.birhtDateG1}}</p>
         <p><b>Nome do Cônjuge:</b> {{bail.spouseFullNameG1}}</p>
     </div>
 
@@ -62,7 +61,7 @@ const html = `<!DOCTYPE html>
         <p><b>Endereço:</b> {{bail.addressG2}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Bairro:</b> {{bail.districtG2}}</p>
         <p><b>Cidade:</b> {{bail.cityG2}}&nbsp;&nbsp;&nbsp;&nbsp;<b>CEP:</b> {{bail.cepG2}}</p>
         <p><b>Contato1:</b> {{bail.contact1G2}}&nbsp;&nbsp;&nbsp;<b>Contato2:</b> {{bail.contact2G2}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Email:</b> {{bail.emailG2}}</p>
-        <p><b>CPF:</b> {{bail.cpfG2}}&nbsp;&nbsp;&nbsp;&nbsp;<b>RG:</b> {{bail.rgG2}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Data de Nascimento: </b>{{birthDateG2}}</p>
+        <p><b>CPF:</b> {{bail.cpfG2}}&nbsp;&nbsp;&nbsp;&nbsp;<b>RG:</b> {{bail.rgG2}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Data de Nascimento: </b>{{birhtDateG2}}</p>
         <p><b>Nome do Cônjuge: </b>{{bail.spouseFullNameG2}}</p>
         <p><b>EDP: </b>{{property.edpInstallation}}&nbsp;&nbsp;&nbsp;&nbsp;<b>RGI: </b>{{property.rgi}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Fornecimento: </b>{{property.supply}}&nbsp;&nbsp;&nbsp;&nbsp;<b>Data Seguro:</b></p>
     </div>

@@ -58,38 +58,40 @@ export class LocatorService {
       });
   }
 
-  async generateLocatorCode(): Promise<number> {
+  async generateLocatorId(): Promise<number> {
     const response = await this.locatorRepository.find({
       select: { id: true },
     });
 
-    const locatorsCode = [];
+    let locatorIds = [];
 
     response.map((value) => {
-      locatorsCode.push(value.id);
+      locatorIds.push(value.id);
     });
 
-    let code = null;
+    locatorIds = locatorIds.sort((a, b) => a - b);
+
+    let id = null;
     let stop = false;
 
-    if (Math.min(...locatorsCode) > 1) {
-      code = 1;
+    if (Math.min(...locatorIds) > 1) {
+      id = 1;
     } else {
-      locatorsCode.map((value, index) => {
-        if (!stop && locatorsCode[index + 1] != value + 1) {
-          code = value + 1;
+      locatorIds.map((value, index) => {
+        if (!stop && locatorIds[index + 1] != value + 1) {
+          id = value + 1;
           stop = true;
         }
       });
     }
 
-    return code;
+    return id;
   }
 
   async create(data: LocatorCreateDto): Promise<string> {
     const locator = this.locatorRepository.create({
       ...data,
-      id: data?.id ?? (await this.generateLocatorCode()),
+      id: data?.id ?? (await this.generateLocatorId()),
     });
 
     return await this.locatorRepository
