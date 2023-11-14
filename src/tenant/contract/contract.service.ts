@@ -76,7 +76,7 @@ export class ContractService {
       loadRelationIds: true,
     });
 
-    await this.bailService.update(contract.id, data);
+    await this.bailService.update(Number(contract.bail), data);
 
     if (!contract) throw new NotFoundException(`Contract ${id} not found`);
 
@@ -85,7 +85,6 @@ export class ContractService {
     });
 
     contract = Object.fromEntries(contractArrayEntries);
-    delete contract['id'];
     delete contract['bail'];
     delete contract['installment'];
 
