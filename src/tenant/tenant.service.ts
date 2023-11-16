@@ -247,6 +247,7 @@ export class TenantService {
     const property = await this.propertyService.findOneBy({
       propertyCode: data?.propertyCode,
     });
+
     if (!property)
       throw new NotFoundException(`Property ${data?.propertyCode} not found`);
 

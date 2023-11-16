@@ -96,7 +96,7 @@ export class InstallmentService {
 
   async generateInstallments(contract: Contract) {
     for (let month = 1; month <= contract?.duration; month++) {
-      const dueDate = new Date();
+      const dueDate = new Date(contract.start);
 
       dueDate.setDate(contract?.payday);
       dueDate.setMonth(dueDate.getMonth() + month);

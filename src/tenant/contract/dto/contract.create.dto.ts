@@ -9,6 +9,7 @@ export interface ContractCreateDto extends BailCreateDto {
   reajust?: string;
   integralValue?: number;
   leaseAmount: number;
+  start: string | Date;
   duration: number;
   payday: number;
   gracePeriod?: number;

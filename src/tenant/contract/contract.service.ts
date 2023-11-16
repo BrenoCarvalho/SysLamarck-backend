@@ -135,10 +135,10 @@ export class ContractService {
   }
 
   async create(data: ContractCreateDto, tenant: Tenant): Promise<Contract> {
-    const start = new Date();
+    const start = new Date(data.start);
     start.setDate(data?.payday);
 
-    const end = new Date();
+    const end = new Date(data.start);
     end.setDate(data?.payday - 1);
     end.setMonth(end.getMonth() + Number(data?.duration));
 
