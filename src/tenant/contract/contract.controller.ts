@@ -28,14 +28,10 @@ export class ContractController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/print')
-  async receipt(
-    @Param() params: any,
-    @Query() query: any,
-    @Res() res: any,
-  ): Promise<any> {
-    const { id } = params;
+  async receipt(@Param() params: any, @Res() res: any) {
+    const { tenantId } = params;
 
-    const buffer = await this.contractService.print({ tenantId: +id });
+    const buffer = await this.contractService.print({ tenantId: +tenantId });
 
     res.set({
       'Content-Type': 'application/pdf',
