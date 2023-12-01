@@ -20,7 +20,7 @@ export class Installment {
   @Column({ length: 20 })
   currentInstallment: string;
 
-  @Column('date')
+  @Column('datetime')
   dueDate: Date;
 
   @Column({ length: 20 })

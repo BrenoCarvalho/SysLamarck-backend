@@ -173,7 +173,7 @@ export class TenantService {
         contract: {
           applyDiscount: tenant?.contract?.applyDiscount ? 'Sim' : 'Não',
           duration: `${tenant?.contract?.duration} Meses`,
-          end: dateFormatter({ value: tenant?.contract?.end }),
+          end: tenant?.contract?.end?.toLocaleDateString('pt-BR') ?? '-',
           goal: tenant?.contract?.goal,
           index: tenant?.contract?.index,
           integralValue: currencyFormatter({
@@ -182,7 +182,7 @@ export class TenantService {
           leaseAmount: `${tenant?.contract?.leaseAmount}`,
           payday: `${tenant?.contract?.payday}`,
           reajust: tenant?.contract?.reajust,
-          start: dateFormatter({ value: tenant?.contract?.start }),
+          start: tenant?.contract?.start?.toLocaleDateString('pt-BR') ?? '-',
         },
         tenant: {
           fullName: tenant?.fullName,

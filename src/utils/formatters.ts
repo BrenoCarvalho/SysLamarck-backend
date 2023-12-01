@@ -1,4 +1,6 @@
 const dateFormatter = ({ value }: { value: any }) => {
+  if (!value) return;
+
   const splited_date = value?.slice(0, 10)?.split('-');
 
   return splited_date?.length

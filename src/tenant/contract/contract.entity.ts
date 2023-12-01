@@ -59,11 +59,14 @@ export class Contract {
   @Column('int', { nullable: true })
   installmentsPaid: number;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'datetime' })
   start: Date;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'datetime' })
   end: Date;
+
+  @Column({ type: 'bool', nullable: true })
+  additionalInstallment: boolean;
 
   @OneToOne(() => Bail, (bail: Bail) => bail.contract)
   bail: Bail;

@@ -94,11 +94,27 @@ export class InstallmentService {
     return installments;
   }
 
-  async generateInstallments(contract: Contract) {
-    for (let month = 1; month <= contract?.duration; month++) {
-      const dueDate = new Date(contract.start);
+  async generateAdditionalInstallment(contract: Contract) {
+    const dueDateForAdditionalInstallment = new Date(contract.start);
+    dueDateForAdditionalInstallment.setDate(contract.payday);
 
-      dueDate.setDate(contract?.payday);
+    await this.create({
+      contract: contract,
+      currentInstallment: `0/${contract?.duration}`,
+      dueDate: dueDateForAdditionalInstallment,
+      amount: contract?.leaseAmount,
+      status: 'Dv',
+    });
+  }
+
+  async generateInstallments(contract: Contract) {
+    if (contract?.additionalInstallment)
+      this.generateAdditionalInstallment(contract);
+
+    const dueDate = new Date(contract.start);
+    dueDate.setDate(contract?.payday);
+
+    for (let month = 1; month <= contract?.duration; month++) {
       dueDate.setMonth(dueDate.getMonth() + month);
 
       await this.create({
