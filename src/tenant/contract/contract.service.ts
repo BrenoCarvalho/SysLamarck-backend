@@ -153,6 +153,8 @@ export class ContractService {
       installmentsPaid: Number(data?.installmentsPaid),
       start,
       end,
+      startFirstContract: start,
+      endFirstContract: end,
     });
 
     return await this.contractRepository

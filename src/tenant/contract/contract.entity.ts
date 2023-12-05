@@ -60,6 +60,12 @@ export class Contract {
   installmentsPaid: number;
 
   @Column({ type: 'datetime' })
+  startFirstContract: Date;
+
+  @Column({ type: 'datetime' })
+  endFirstContract: Date;
+
+  @Column({ type: 'datetime' })
   start: Date;
 
   @Column({ type: 'datetime' })
