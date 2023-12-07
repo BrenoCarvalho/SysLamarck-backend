@@ -67,7 +67,18 @@ export class ContractService {
   async print({ tenantId }: { tenantId: number }): Promise<Buffer> {
     const tenant = await this.tenantService.findOne(tenantId);
 
-    return buildHtml(ContractToPrint({}), { format: 'A4' });
+    return buildHtml(
+      ContractToPrint({
+        tenant,
+        bail: tenant.contract.bail,
+        contract: tenant.contract,
+        property: tenant.property,
+        locator: tenant.property.locator,
+      }),
+      {
+        format: 'A4',
+      },
+    );
   }
 
   async update(id: number, data: ContractCreateDto): Promise<string> {

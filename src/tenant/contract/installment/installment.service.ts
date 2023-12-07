@@ -92,6 +92,9 @@ export class InstallmentService {
 
   async generateAdditionalInstallment(contract: Contract) {
     const dueDateForAdditionalInstallment = new Date(contract.start);
+    dueDateForAdditionalInstallment.setMonth(
+      dueDateForAdditionalInstallment.getMonth() + 1,
+    );
     dueDateForAdditionalInstallment.setDate(contract.payday);
 
     await this.create({
@@ -107,10 +110,14 @@ export class InstallmentService {
     if (contract?.additionalInstallment)
       this.generateAdditionalInstallment(contract);
 
-    const dueDate = new Date(contract.start);
-    dueDate.setDate(contract?.payday);
+    for (
+      let month = contract?.additionalInstallment ? 2 : 1;
+      month <= contract?.duration;
+      month++
+    ) {
+      const dueDate = new Date(contract.start);
 
-    for (let month = 1; month <= contract?.duration; month++) {
+      dueDate.setDate(contract?.payday);
       dueDate.setMonth(dueDate.getMonth() + month);
 
       await this.create({
