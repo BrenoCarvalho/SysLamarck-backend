@@ -21,11 +21,7 @@ import {
   RentReceiptForLocator,
   RentReceiptForTenant,
 } from 'src/templates/rentReceipt';
-import {
-  currencyFormatter,
-  dateFormatter,
-  propertyCodeFormatter,
-} from 'src/utils/formatters';
+import { currencyFormatter, propertyCodeFormatter } from 'src/utils/formatters';
 
 const monthNames = [
   'Janeiro',
@@ -137,13 +133,11 @@ export class InstallmentService {
   }: {
     installment: Installment;
   }): RentReceiptDefaultProps {
-    const dueDate = dateFormatter({
-      value: installment.dueDate,
-    });
+    const dueDate = installment.dueDate;
 
     const referenceMonth = `${
       monthNames.indexOf(installment.referenceMonth) + 1
-    }/${dueDate.slice(6)}`;
+    }/${dueDate.getFullYear()}`;
 
     const paymentDate = new Date(
       installment.transaction[0].createdAt,
@@ -168,8 +162,8 @@ export class InstallmentService {
       },
       installment: {
         referenceMonth,
-        dueDateMonth: dueDate.slice(3),
-        dueDate,
+        dueDateMonth: dueDate.toLocaleDateString('pt-BR'),
+        dueDate: dueDate.toLocaleDateString('pt-BR'),
         paymentDate: paymentDate,
         currentInstallment: installment.currentInstallment,
       },
