@@ -1,4 +1,5 @@
 import { handlebars } from 'hbs';
+import { Tenant } from 'src/tenant/tenant.entity';
 
 const html = `<!DOCTYPE html>
 <html lang="en">
@@ -88,6 +89,10 @@ const html = `<!DOCTYPE html>
 </body>
 </html>`;
 
+interface CustomTenantProps extends Omit<Tenant, 'birthDate'> {
+  birthDate: string;
+}
+
 interface RegistrationFormProps {
   locator: {
     id: string;
@@ -157,15 +162,7 @@ interface RegistrationFormProps {
     birthDateG2: string;
     spouseFullNameG2: string;
   };
-  tenant: {
-    fullName: string;
-    contact1: string;
-    contact2: string;
-    email: string;
-    cpf: string;
-    rg: string;
-    birthDate: string;
-  };
+  tenant: CustomTenantProps;
 }
 
 const RegistrationForm = (props: RegistrationFormProps) => {
