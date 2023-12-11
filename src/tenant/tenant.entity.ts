@@ -23,7 +23,7 @@ export class Tenant {
   @Column({ length: 100 })
   fullName: string;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   birthDate: Date;
 
   @Column({ length: 100, nullable: true })
@@ -53,7 +53,7 @@ export class Tenant {
   @Column({ length: 100, nullable: true })
   fullNameT2: string;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   birthDateT2: Date;
 
   @Column({ length: 100, nullable: true })
