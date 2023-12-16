@@ -5,18 +5,22 @@ import {
   HttpStatus,
   NotFoundException,
   ConflictException,
+  forwardRef,
 } from '@nestjs/common';
 import { Between, Repository } from 'typeorm';
 import { Cashier } from './cashier.entity';
 import CashFlowReport from 'src/templates/cashFlowReport';
 import { currencyFormatter } from 'src/utils/formatters';
 import { create as buildHtml } from 'puppeteer-html-pdf';
+import { ContractService } from 'src/tenant/contract/contract.service';
 
 @Injectable()
 export class CashierService {
   constructor(
     @Inject('CASHIER_REPOSITORY')
     private cashierRepository: Repository<Cashier>,
+    @Inject(forwardRef(() => ContractService))
+    private contractService: ContractService,
   ) {}
 
   async findAll(): Promise<Cashier[]> {
@@ -48,6 +52,30 @@ export class CashierService {
       (transaction) => transaction.category === 'rent',
     );
 
+    const receiveTransactions = cashierRentTransactions.filter(
+      (rentTransaction) => rentTransaction.type === 'credit',
+    );
+
+    let totalAdministrationFee = 0;
+
+    await Promise.all(
+      receiveTransactions.map(async (receiveTransaction) => {
+        const tenant = receiveTransaction.installment.contract.tenant;
+
+        const receiveTransactionData =
+          typeof receiveTransaction.data === 'string'
+            ? JSON.parse(receiveTransaction.data)
+            : receiveTransaction.data;
+
+        totalAdministrationFee +=
+          ((Number(receiveTransactionData?.rent ?? 0) +
+            Number(receiveTransactionData?.iptu ?? 0) +
+            Number(receiveTransactionData?.breachOfContractFine ?? 0)) *
+            Number(tenant?.property?.administrationTax ?? 0)) /
+          100;
+      }),
+    );
+
     const genericTransactions =
       cashierGenericTransactions.map((transaction) => ({
         description: transaction.description,
@@ -56,8 +84,19 @@ export class CashierService {
         formOfPayment: transaction.formOfPayment ?? 'Não informado',
       })) ?? [];
 
+    const totalTransferRent = cashierRentTransactions
+      .filter((transaction) => transaction.type === 'debit')
+      .reduce((total, transaction) => total + transaction.amount, 0);
+
+    genericTransactions.push({
+      description: 'Total repasse de aluguéis',
+      type: 'Débito',
+      amount: currencyFormatter({ value: totalTransferRent }),
+      formOfPayment: '-',
+    });
+
     const rentTransactions =
-      cashierRentTransactions?.map((transaction) => {
+      receiveTransactions?.map((transaction) => {
         const amount = currencyFormatter({ value: transaction.amount ?? 0 });
 
         return {
@@ -90,7 +129,7 @@ export class CashierService {
         value: totalGenericTransactions.credit,
       }),
       debit: currencyFormatter({
-        value: totalGenericTransactions.debit,
+        value: totalGenericTransactions.debit + totalTransferRent,
       }),
     };
 
@@ -140,7 +179,9 @@ export class CashierService {
           rentTransactions,
           totalGenericTransactions: totalGenericTransactionsFormatted,
           totalRentTransactions: totalRentTransactionsFormatted,
-          administrationFee: '',
+          administrationFee: currencyFormatter({
+            value: totalAdministrationFee,
+          }),
           totalCredit,
           totalDebit,
           balance,
@@ -153,7 +194,13 @@ export class CashierService {
   async cashFlowReport({ cashierId }: { cashierId: number }): Promise<Buffer> {
     const cashier = await this.cashierRepository.findOne({
       where: { id: cashierId },
-      relations: { transaction: true },
+      relations: [
+        'transaction',
+        'transaction.installment',
+        'transaction.installment.contract',
+        'transaction.installment.contract.tenant',
+        'transaction.installment.contract.tenant.property',
+      ],
     });
 
     if (!cashier)

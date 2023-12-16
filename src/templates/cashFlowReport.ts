@@ -118,12 +118,6 @@ const html = `<!DOCTYPE html>
           {{/each}}
         </div>
         <div>
-          <p><b><u>TIPO</b></u></p>
-          {{#each cashier.rentTransactions}}
-            <p>{{this.type}}</p>
-          {{/each}}
-        </div>
-        <div>
           <p><b><u>VALOR</b></u></p>
           {{#each cashier.rentTransactions}}
             <p>{{this.amount}}</p>
@@ -139,22 +133,15 @@ const html = `<!DOCTYPE html>
     <div class="caixa">
         <div class="containerItens">
             <div>
-                <p><b>SUBTOTAL:</b></p>
-            </div>
-            <div>
                 <p><b>ENTRADAS - {{cashier.totalRentTransactions.credit}}</b></p>
             </div>
-            <div>
-                <p><b>SAÍDAS - {{cashier.totalRentTransactions.debit}}</b></p>
-            </div>
-            
         </div>
     </div>
     <br />
     <div class="linhaBaixo">
       <p><b>TOTAL GERAL DO FLUXO DE CAIXA</b></p>  
     </div>
-    <p><b>Total de <u>taxa de administração</u> sobre alugueis:</b> {{cashier.adiministrationFee}}</p>
+    <p><b>Total de <u>taxa de administração</u> sobre alugueis:</b> {{cashier.administrationFee}}</p>
     <p><b>Total de <u>entradas</u>:</b> {{cashier.totalCredit}}</p>
     <p><b>Total de <u>saídas</u>:</b> {{cashier.totalDebit}}</p>
     <p><b>SALDO FINAL:</b> {{cashier.balance}} </p>    
