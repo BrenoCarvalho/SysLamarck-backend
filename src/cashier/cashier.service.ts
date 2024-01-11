@@ -88,13 +88,6 @@ export class CashierService {
       .filter((transaction) => transaction.type === 'debit')
       .reduce((total, transaction) => total + transaction.amount, 0);
 
-    genericTransactions.push({
-      description: 'Total repasse de aluguéis',
-      type: 'Débito',
-      amount: currencyFormatter({ value: totalTransferRent }),
-      formOfPayment: '-',
-    });
-
     const rentTransactions =
       receiveTransactions?.map((transaction) => {
         const amount = currencyFormatter({ value: transaction.amount ?? 0 });
