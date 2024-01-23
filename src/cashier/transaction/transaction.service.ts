@@ -39,6 +39,10 @@ export class TransactionService {
     });
   }
 
+  async update({ id, data }: { id: number; data }) {
+    return await this.transactionRepository.update({ id }, data);
+  }
+
   async delete(id: number): Promise<number> {
     return (await this.transactionRepository.delete(id)).affected;
   }

@@ -3,8 +3,10 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -12,6 +14,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Transaction } from './transaction.entity';
 import { TransactionCreateDto } from './dto/transaction.create.dto';
 import { TransactionService } from './transaction.service';
+import { TransactionEditDto } from './dto/transaction.edit.dto';
 
 @Controller('cashier/transaction')
 export class TransactionController {
@@ -44,6 +47,20 @@ export class TransactionController {
   @Post()
   async create(@Body() data: TransactionCreateDto): Promise<Transaction> {
     return await this.transactionService.create(data);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  async update(
+    @Param() params,
+    @Body() data: TransactionEditDto,
+  ): Promise<any> {
+    if (!params['id']) throw new NotFoundException('missing id.');
+
+    return await this.transactionService.update({
+      id: params['id'],
+      data,
+    });
   }
 
   @UseGuards(JwtAuthGuard)
