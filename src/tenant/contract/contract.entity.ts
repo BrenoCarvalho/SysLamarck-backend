@@ -23,6 +23,9 @@ export class Contract {
   @JoinColumn()
   tenant: Tenant;
 
+  @Column({ type: 'boolean', default: true })
+  activated: boolean;
+
   @Column({ nullable: true })
   applyDiscount: boolean;
 
@@ -70,6 +73,9 @@ export class Contract {
 
   @Column({ type: 'datetime' })
   end: Date;
+
+  @Column('int')
+  contractRenewal: number;
 
   @Column({ type: 'bool', nullable: true })
   additionalInstallment: boolean;

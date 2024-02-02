@@ -47,6 +47,12 @@ export class ContractController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post('renewal')
+  async renewal(@Param() params: any): Promise<Contract> {
+    return await this.contractService.renewal(params?.tenantId);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('updateCurrentInstallment')
   async updateCurrentInstallment(@Param() params: any): Promise<number> {
     return await this.contractService.updateCurrentInstallment(

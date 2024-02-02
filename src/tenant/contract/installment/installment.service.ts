@@ -69,9 +69,14 @@ export class InstallmentService {
   async findByTenantId(tenantId: number): Promise<Installment[]> {
     if (!tenantId) return;
 
+    const contract = await this.contractService.findOneByTenantId({ tenantId });
+
     const installments = (
       await this.installmentRepository.find({
-        where: { contract: { tenant: { id: tenantId } } },
+        where: {
+          contract: { id: contract.id },
+          contractRenewal: contract.contractRenewal,
+        },
         loadRelationIds: true,
         relations: {
           transaction: true,
@@ -79,12 +84,8 @@ export class InstallmentService {
       })
     ).sort(
       (a, b) =>
-        Number(
-          a.currentInstallment.substring(0, a.currentInstallment.length - 3),
-        ) -
-        Number(
-          b.currentInstallment.substring(0, b.currentInstallment.length - 3),
-        ),
+        Number(a.currentInstallment.split('/')[0]) -
+        Number(b.currentInstallment.split('/')[0]),
     );
 
     return installments;
@@ -107,7 +108,7 @@ export class InstallmentService {
   }
 
   async generateInstallments(contract: Contract) {
-    if (contract?.additionalInstallment)
+    if (contract.contractRenewal === 0 && contract?.additionalInstallment)
       this.generateAdditionalInstallment(contract);
 
     const startDueDate = new Date(contract.start);
@@ -124,10 +125,13 @@ export class InstallmentService {
         dueDate: dueDate,
         amount: contract?.leaseAmount,
         status:
-          month <= contract?.installmentsPaid ?? 0
-            ? 'Pg'
-            : month <= contract?.gracePeriod + (contract?.installmentsPaid ?? 0)
-            ? 'Ca'
+          contract.contractRenewal != 0
+            ? month <= contract?.installmentsPaid ?? 0
+              ? 'Pg'
+              : month <=
+                contract?.gracePeriod + (contract?.installmentsPaid ?? 0)
+              ? 'Ca'
+              : 'Dv'
             : 'Dv',
       });
     }
@@ -493,6 +497,7 @@ export class InstallmentService {
     const installment = this.installmentRepository.create({
       ...data,
       referenceMonth: monthNames[referenceMonthIndex],
+      contractRenewal: data?.contract?.contractRenewal,
     });
 
     return await this.installmentRepository

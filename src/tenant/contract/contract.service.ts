@@ -119,6 +119,57 @@ export class ContractService {
       });
   }
 
+  async renewal(tenantId: number): Promise<Contract> {
+    let contract = await this.contractRepository.findOneBy({
+      tenant: { id: tenantId },
+    });
+
+    const start = contract.end;
+    start.setDate(start.getDate() + 1);
+
+    const end = new Date(start);
+    end.setMonth(end.getMonth() + Number(contract.duration));
+    end.setDate(end.getDate() - 1);
+
+    await this.contractRepository.update(
+      { id: contract.id },
+      {
+        start,
+        end,
+        contractRenewal: contract?.contractRenewal + 1,
+        activated: true,
+      },
+    );
+
+    contract = await this.contractRepository.findOneBy({
+      tenant: { id: tenantId },
+    });
+
+    await this.installmentService.generateInstallments(contract);
+    await this.updateCurrentInstallment(tenantId);
+
+    return contract;
+  }
+
+  async finalizeContract({
+    contractId,
+    tenantId,
+  }: {
+    contractId?: number;
+    tenantId?: number;
+  }) {
+    if (contractId)
+      await this.contractRepository.update(
+        { id: contractId },
+        { activated: false },
+      );
+    else
+      await this.contractRepository.update(
+        { tenant: { id: tenantId } },
+        { activated: false },
+      );
+  }
+
   async updateCurrentInstallment(tenantId: number): Promise<number> {
     const installments = await this.installmentService.findByTenantId(tenantId);
 
@@ -126,12 +177,8 @@ export class ContractService {
       .filter((installment) => installment.status === 'Dv')
       .sort(
         (a, b) =>
-          Number(
-            a.currentInstallment.substring(0, a.currentInstallment.length - 3),
-          ) -
-          Number(
-            b.currentInstallment.substring(0, b.currentInstallment.length - 3),
-          ),
+          Number(a.currentInstallment.split('/')[0]) -
+          Number(b.currentInstallment.split('/')[0]),
       );
 
     if (unpaidInstallments?.length > 0)
@@ -143,6 +190,9 @@ export class ContractService {
           },
         )
       ).affected;
+    else {
+      await this.finalizeContract({ tenantId });
+    }
   }
 
   async create(data: ContractCreateDto, tenant: Tenant): Promise<Contract> {
@@ -158,10 +208,12 @@ export class ContractService {
     const contract = this.contractRepository.create({
       ...data,
       tenant,
+      activated: true,
       duration: Number(data?.duration),
       payday: Number(data?.payday),
       gracePeriod: Number(data?.gracePeriod),
       installmentsPaid: Number(data?.installmentsPaid),
+      contractRenewal: 0,
       start,
       end,
       startFirstContract: start,

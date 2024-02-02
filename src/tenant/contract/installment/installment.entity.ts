@@ -36,6 +36,9 @@ export class Installment {
   })
   status: 'Pg' | 'Dv' | 'Ca';
 
+  @Column('int')
+  contractRenewal: number;
+
   @OneToMany(() => Transaction, (transaction) => transaction.installment)
   transaction: Transaction[];
 
